@@ -19,7 +19,7 @@ public:
     void Render();
 
 private:
-    const std::string SHADER_FILENAME { "res\\shader\\mesh_shader.fx" };
+    const std::string SHADER_FILENAME { "mesh_shader.fx" };
     LPD3DXMESH m_D3DMesh { nullptr };
 
     LPD3DXEFFECT m_D3DEffect { nullptr };
