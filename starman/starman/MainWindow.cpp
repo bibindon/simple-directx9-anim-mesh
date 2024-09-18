@@ -127,7 +127,7 @@ MainWindow::MainWindow(const HINSTANCE& hInstance)
 
     D3DXVECTOR3 b = D3DXVECTOR3(0, 1, 0);
     D3DXVECTOR3 c = D3DXVECTOR3(0, 0, 0);
-    m_Mesh1 = new Mesh("res\\model\\tiger\\tiger.x", b, c, 1.0f);
+    m_Mesh1 = new Mesh("tiger.x", b, c, 1.0f);
 
     // ウィンドウ表示
     ShowWindow(m_hWnd, SW_SHOW);
