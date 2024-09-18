@@ -27,13 +27,7 @@ private:
     D3DXVECTOR3 m_pos { };
     D3DXVECTOR3 m_rotate { };
 
-    D3DXHANDLE m_meshTextureHandle { nullptr };
-    D3DXHANDLE m_diffuseHandle { nullptr };
-    D3DXHANDLE m_lightNormalHandle { nullptr };
-    D3DXHANDLE m_brightnessHandle { nullptr };
-
     DWORD m_materialCount { 0 };
-    D3DXHANDLE m_worldViewProjHandle { nullptr };
     std::vector<D3DCOLORVALUE> m_vecColor { };
     std::vector<LPDIRECT3DTEXTURE9> m_vecTexture { };
     D3DXVECTOR3 m_centerPos { 0.0f, 0.0f, 0.0f };

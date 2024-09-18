@@ -21,17 +21,10 @@ public:
     int MainLoop();
 
 private:
-    const std::string TITLE = "ƒzƒVƒ}ƒ“";
+    const std::string TITLE = "simple anim mesh";
     MSG m_msg;
     HWND m_hWnd;
     LPDIRECT3D9 m_D3D;
-    D3DLIGHT9 light;
-    ID3DXBuffer* pMaterials;
-    DWORD NumMaterials;
-    ID3DXMesh* pMesh;
-    ID3DXBuffer* pAX_Materials;
-    DWORD AX_NumMaterials;
-    ID3DXMesh* pAX_Mesh;
 
     Mesh* m_Mesh1 { nullptr };
     LPDIRECTINPUT8 m_directInput { nullptr };

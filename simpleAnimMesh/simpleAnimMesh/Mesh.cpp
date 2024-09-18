@@ -31,12 +31,6 @@ Mesh::Mesh(
         throw std::exception("Failed to create an effect file.");
     }
 
-    m_worldViewProjHandle = m_D3DEffect->GetParameterByName(nullptr, "g_world_view_projection");
-    m_lightNormalHandle = m_D3DEffect->GetParameterByName(nullptr, "g_light_normal");
-    m_brightnessHandle = m_D3DEffect->GetParameterByName(nullptr, "g_light_brightness");
-    m_meshTextureHandle = m_D3DEffect->GetParameterByName(nullptr, "g_mesh_texture");
-    m_diffuseHandle = m_D3DEffect->GetParameterByName(nullptr, "g_diffuse");
-
     LPD3DXBUFFER adjacencyBuffer { nullptr };
     LPD3DXBUFFER materialBuffer { nullptr };
 
@@ -183,7 +177,7 @@ void Mesh::Render()
     worldViewProjMatrix *= Camera::GetViewMatrix();
     worldViewProjMatrix *= Camera::GetProjMatrix();
 
-    m_D3DEffect->SetMatrix(m_worldViewProjHandle, &worldViewProjMatrix);
+    m_D3DEffect->SetMatrix("g_world_view_proj", &worldViewProjMatrix);
 
     m_D3DEffect->Begin(nullptr, 0);
 
@@ -198,8 +192,8 @@ void Mesh::Render()
     {
         D3DXVECTOR4 vec4Color {
             m_vecColor.at(i).r, m_vecColor.at(i).g, m_vecColor.at(i).b, m_vecColor.at(i).a};
-        m_D3DEffect->SetVector(m_diffuseHandle, &vec4Color);
-        m_D3DEffect->SetTexture(m_meshTextureHandle, m_vecTexture.at(i));
+        m_D3DEffect->SetVector("g_diffuse", &vec4Color);
+        m_D3DEffect->SetTexture("g_mesh_texture", m_vecTexture.at(i));
         m_D3DEffect->CommitChanges();
         m_D3DMesh->DrawSubset(i);
     }
