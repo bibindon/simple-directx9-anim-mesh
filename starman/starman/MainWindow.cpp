@@ -1,7 +1,6 @@
 #include "MainWindow.h"
 #include <exception>
 #include "KeyBoard.h"
-#include "Mouse.h"
 #include "Common.h"
 #include "Camera.h"
 
@@ -122,7 +121,6 @@ MainWindow::MainWindow(const HINSTANCE& hInstance)
         (LPVOID*)&m_directInput, NULL);
 
     KeyBoard::Init(m_directInput, m_hWnd);
-    Mouse::Init(m_directInput, m_hWnd);
 
     D3DXVECTOR3 b = D3DXVECTOR3(5, 1, 0);
     D3DXVECTOR3 c = D3DXVECTOR3(0, 0, 0);
@@ -173,7 +171,6 @@ int MainWindow::MainLoop()
         }
 
         KeyBoard::Update();
-        Mouse::Update();
         Camera::Update();
 
         if (KeyBoard::IsDown(DIK_ESCAPE))
