@@ -4,7 +4,6 @@
 #include "Mouse.h"
 #include "Common.h"
 #include "Camera.h"
-#include "SharedObj.h"
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT mes, WPARAM wParam, LPARAM lParam)
 {
@@ -100,7 +99,7 @@ MainWindow::MainWindow(const HINSTANCE& hInstance)
 //        m_D3D->Release();
 //        throw std::exception("");
 //    }
-    SharedObj::SetD3DDevice(D3DDevice);
+    Common::SetD3DDevice(D3DDevice);
 
     ZeroMemory(&light, sizeof(D3DLIGHT9));
     light.Direction = D3DXVECTOR3(-1, -20, 0);
@@ -136,13 +135,13 @@ MainWindow::MainWindow(const HINSTANCE& hInstance)
 
 MainWindow::~MainWindow()
 {
-    SharedObj::Finalize();
+    Common::Finalize();
     m_D3D->Release();
 }
 
 int MainWindow::MainLoop()
 {
-    LPDIRECT3DDEVICE9 D3DDevice = SharedObj::GetD3DDevice();
+    LPDIRECT3DDEVICE9 D3DDevice = Common::GetD3DDevice();
     D3DXMATRIX World;          // 立方体ワールド変換行列
     D3DXMATRIX Rot_X, Rot_Y;   // 立方体回転行列
     D3DXMATRIX Offset;         // 立方体オフセット行列

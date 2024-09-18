@@ -6,7 +6,6 @@
 #include "AnimationStrategy.h"
 #include "Light.h"
 #include "Camera.h"
-#include "SharedObj.h"
 
 using std::vector;
 using std::string;
@@ -47,7 +46,7 @@ AnimMesh::AnimMesh(
 {
     HRESULT result { 0 };
     D3DXCreateEffectFromFile(
-        SharedObj::GetD3DDevice(),
+        Common::GetD3DDevice(),
         SHADER_FILENAME.c_str(),
         nullptr,
         nullptr,
@@ -73,7 +72,7 @@ AnimMesh::AnimMesh(
     result = D3DXLoadMeshHierarchyFromX(
         xFilename.c_str(),
         D3DXMESH_MANAGED,
-        SharedObj::GetD3DDevice(),
+        Common::GetD3DDevice(),
         m_allocator.get(),
         nullptr,
         &temp_root_frame,

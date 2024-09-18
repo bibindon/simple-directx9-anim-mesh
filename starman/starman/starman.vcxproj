@@ -161,7 +161,7 @@
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SeqBattle.cpp" />
-    <ClCompile Include="SharedObj.cpp" />
+    <ClCompile Include="Common.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimationStrategy.h" />
@@ -176,7 +176,6 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SeqBattle.h" />
-    <ClInclude Include="SharedObj.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="animation_mesh_shader.fx" />

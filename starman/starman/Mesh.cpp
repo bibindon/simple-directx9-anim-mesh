@@ -2,7 +2,6 @@
 #include "Light.h"
 #include "Common.h"
 #include "Camera.h"
-#include "SharedObj.h"
 
 using std::string;
 using std::vector;
@@ -20,7 +19,7 @@ Mesh::Mesh(
 
     HRESULT result { 0 };
     D3DXCreateEffectFromFile(
-        SharedObj::GetD3DDevice(),
+        Common::GetD3DDevice(),
         SHADER_FILENAME.c_str(),
         nullptr,
         nullptr,
@@ -45,7 +44,7 @@ Mesh::Mesh(
     result = D3DXLoadMeshFromX(
         xFilename.c_str(),
         D3DXMESH_SYSTEMMEM,
-        SharedObj::GetD3DDevice(),
+        Common::GetD3DDevice(),
         &adjacencyBuffer,
         &materialBuffer,
         nullptr,
@@ -85,7 +84,7 @@ Mesh::Mesh(
     };
 
     LPD3DXMESH tempMesh { nullptr };
-    result = m_D3DMesh->CloneMesh(D3DXMESH_MANAGED, decl, SharedObj::GetD3DDevice(), &tempMesh);
+    result = m_D3DMesh->CloneMesh(D3DXMESH_MANAGED, decl, Common::GetD3DDevice(), &tempMesh);
 
     if (FAILED(result))
     {
@@ -135,7 +134,7 @@ Mesh::Mesh(
             texPath += materials[i].pTextureFilename;
             LPDIRECT3DTEXTURE9 tempTexture { nullptr };
             if (FAILED(D3DXCreateTextureFromFile(
-                SharedObj::GetD3DDevice(),
+                Common::GetD3DDevice(),
                 texPath.c_str(),
                 &tempTexture)))
             {
