@@ -148,7 +148,6 @@
     <ClCompile Include="AnimMeshAlloc.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Common.cpp" />
-    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="KeyBoard.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="main.cpp" />
@@ -162,7 +161,6 @@
     <ClCompile Include="SeqTitle.cpp" />
     <ClCompile Include="SharedObj.cpp" />
     <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="Stage.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimationStrategy.h" />
@@ -170,7 +168,6 @@
     <ClInclude Include="AnimMeshAlloc.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Common.h" />
-    <ClInclude Include="Enemy.h" />
     <ClInclude Include="KeyBoard.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="MainWindow.h" />
@@ -183,7 +180,6 @@
     <ClInclude Include="SeqTitle.h" />
     <ClInclude Include="SharedObj.h" />
     <ClInclude Include="Sprite.h" />
-    <ClInclude Include="Stage.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="res\shader\animation_mesh_shader.fx">
