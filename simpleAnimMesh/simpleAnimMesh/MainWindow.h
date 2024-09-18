@@ -4,14 +4,9 @@
 #include <tchar.h>
 #include <d3d9.h>
 #include <d3dx9.h>
-#ifndef DIRECTINPUT_VERSION
-#define DIRECTINPUT_VERSION 0x0800
-#endif
-#include <dinput.h>
 #include  <string>
 #include "Mesh.h"
 #include "AnimMesh.h"
-#include "SeqBattle.h"
 
 class MainWindow
 {
@@ -25,10 +20,7 @@ private:
     MSG m_msg;
     HWND m_hWnd;
     LPDIRECT3D9 m_D3D;
-
     Mesh* m_Mesh1 { nullptr };
-    LPDIRECTINPUT8 m_directInput { nullptr };
-
-    SeqBattle* m_seqBattle { nullptr };
+    AnimMesh* m_AnimMesh2 = { nullptr };
 };
 

@@ -83,13 +83,11 @@ MainWindow::MainWindow(const HINSTANCE& hInstance)
 
     Common::SetD3DDevice(D3DDevice);
 
-    D3DXVECTOR3 b = D3DXVECTOR3(5, 1, 0);
-    D3DXVECTOR3 c = D3DXVECTOR3(0, 0, 0);
-    m_Mesh1 = new Mesh("tiger.x", b, c, 1.0f);
+    m_Mesh1 = new Mesh("tiger.x", D3DXVECTOR3(3, 1, 0), D3DXVECTOR3(0, 0, 0), 1.0f);
+    m_AnimMesh2 = new AnimMesh("hoshiman.x", D3DXVECTOR3(0, 0, 0), D3DXVECTOR3(0, 0, 0), 0.5f);
 
     // ウィンドウ表示
     ShowWindow(m_hWnd, SW_SHOW);
-    m_seqBattle = new SeqBattle();
 }
 
 MainWindow::~MainWindow()
@@ -102,8 +100,7 @@ int MainWindow::MainLoop()
 {
     LPDIRECT3DDEVICE9 D3DDevice = Common::GetD3DDevice();
 
-    D3DXVECTOR3 b = D3DXVECTOR3(0.f, 0.f, 0.f);
-    Camera::SetPos(b);
+    Camera::SetPos(D3DXVECTOR3(0.f, 0.f, 0.f));
 
     do
     {
@@ -115,14 +112,11 @@ int MainWindow::MainLoop()
 
         Camera::Update();
 
-        m_seqBattle->Update();
-
-        D3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(40, 40, 80),
-            1.0f, 0);
+        D3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(40, 40, 80), 1.0f, 0);
         D3DDevice->BeginScene();
 
-        m_seqBattle->Render();
         m_Mesh1->Render();
+        m_AnimMesh2->Render();
 
         D3DDevice->EndScene();
         D3DDevice->Present(NULL, NULL, NULL, NULL);
