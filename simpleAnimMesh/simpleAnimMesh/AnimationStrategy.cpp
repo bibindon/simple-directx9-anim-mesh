@@ -61,7 +61,7 @@ void normal_animation::set_animation(const std::string& animation_set)
 };
 void normal_animation::update()
 {
-    animation_time_ += Common::ANIMATION_SPEED;
+    animation_time_ += 1.f/60;
     animation_controller_->SetTrackPosition(0, 0.f);
     animation_controller_->AdvanceTime(animation_time_, nullptr);
     if (is_playing_)

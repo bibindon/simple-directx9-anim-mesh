@@ -10,11 +10,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT mes, WPARAM wParam, LPARAM lParam)
         PostQuitMessage(0);
         return 0;
     }
-    else if (mes == WM_SETCURSOR)
-    {
-        ShowCursor(false);
-        return 0;
-    }
 
     return DefWindowProc(hWnd, mes, wParam, lParam);
 }
@@ -46,7 +41,6 @@ MainWindow::MainWindow(const HINSTANCE& hInstance)
         throw std::exception("");
     }
 
-    // Direct3Dの初期化
     if (!(m_D3D = Direct3DCreate9(D3D_SDK_VERSION)))
     {
         throw std::exception("");
@@ -86,7 +80,6 @@ MainWindow::MainWindow(const HINSTANCE& hInstance)
     m_Mesh1 = new Mesh("tiger.x", D3DXVECTOR3(3, 1, 0), D3DXVECTOR3(0, 0, 0), 1.0f);
     m_AnimMesh2 = new AnimMesh("hoshiman.x", D3DXVECTOR3(0, 0, 0), D3DXVECTOR3(0, 0, 0), 0.5f);
 
-    // ウィンドウ表示
     ShowWindow(m_hWnd, SW_SHOW);
 }
 
@@ -99,8 +92,7 @@ MainWindow::~MainWindow()
 int MainWindow::MainLoop()
 {
     LPDIRECT3DDEVICE9 D3DDevice = Common::GetD3DDevice();
-
-    Camera::SetPos(D3DXVECTOR3(0.f, 0.f, 0.f));
+    MSG m_msg;
 
     do
     {
@@ -121,7 +113,7 @@ int MainWindow::MainLoop()
         D3DDevice->EndScene();
         D3DDevice->Present(NULL, NULL, NULL, NULL);
 
-
     } while (m_msg.message != WM_QUIT);
+
     return 0;
 }

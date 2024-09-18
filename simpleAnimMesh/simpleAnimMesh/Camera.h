@@ -5,8 +5,6 @@ class Camera
 public:
     static D3DXMATRIX GetViewMatrix();
     static D3DXMATRIX GetProjMatrix();
-    static void SetPos(const D3DXVECTOR3& lookAtPos);
-    static float GetRadian();
     static void Update();
 
 private:

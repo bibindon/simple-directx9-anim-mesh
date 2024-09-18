@@ -17,7 +17,6 @@ public:
 
 private:
     const std::string TITLE = "simple anim mesh";
-    MSG m_msg;
     HWND m_hWnd;
     LPDIRECT3D9 m_D3D;
     Mesh* m_Mesh1 { nullptr };

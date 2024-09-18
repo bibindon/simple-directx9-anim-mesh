@@ -29,20 +29,9 @@ D3DXMATRIX Camera::GetProjMatrix()
     return projection_matrix;
 }
 
-void Camera::SetPos(const D3DXVECTOR3& lookAtPos)
-{
-    m_lookAtPos = lookAtPos;
-}
-
-float Camera::GetRadian()
-{
-    return m_radian;
-}
-
 void Camera::Update()
 {
-    LONG x = 1;
-    m_radian += x/100.f;
+    m_radian += 1/100.f;
     m_eyePos.x = m_lookAtPos.x + std::sin(m_radian)*10;
     m_eyePos.z = m_lookAtPos.z + std::cos(m_radian)*10;
 }
