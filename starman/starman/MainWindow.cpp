@@ -125,7 +125,7 @@ MainWindow::MainWindow(const HINSTANCE& hInstance)
     KeyBoard::Init(m_directInput, m_hWnd);
     Mouse::Init(m_directInput, m_hWnd);
 
-    D3DXVECTOR3 b = D3DXVECTOR3(0, 1, 0);
+    D3DXVECTOR3 b = D3DXVECTOR3(5, 1, 0);
     D3DXVECTOR3 c = D3DXVECTOR3(0, 0, 0);
     m_Mesh1 = new Mesh("tiger.x", b, c, 1.0f);
 

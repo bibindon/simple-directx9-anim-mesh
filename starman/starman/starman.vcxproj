@@ -153,7 +153,6 @@
     <ClCompile Include="AnimMesh.cpp" />
     <ClCompile Include="AnimMeshAlloc.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Common.cpp" />
     <ClCompile Include="KeyBoard.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="main.cpp" />

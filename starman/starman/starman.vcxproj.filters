@@ -39,9 +39,6 @@
     <ClCompile Include="Player.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Common.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="Light.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>

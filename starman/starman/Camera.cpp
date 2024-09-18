@@ -43,9 +43,7 @@ float Camera::GetRadian()
 void Camera::Update()
 {
     LONG x = Mouse::GetX();
-    float joyX { 0.0f };
     m_radian += x/100.f;
-    m_radian += joyX;
     m_eyePos.x = m_lookAtPos.x + std::sin(m_radian)*10;
     m_eyePos.z = m_lookAtPos.z + std::cos(m_radian)*10;
 }
