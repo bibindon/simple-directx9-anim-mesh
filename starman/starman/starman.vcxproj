@@ -156,11 +156,7 @@
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="SeqBattle.cpp" />
-    <ClCompile Include="SeqEnding.cpp" />
-    <ClCompile Include="SeqOpening.cpp" />
-    <ClCompile Include="SeqTitle.cpp" />
     <ClCompile Include="SharedObj.cpp" />
-    <ClCompile Include="Sprite.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AnimationStrategy.h" />
@@ -175,11 +171,7 @@
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="SeqBattle.h" />
-    <ClInclude Include="SeqEnding.h" />
-    <ClInclude Include="SeqOpening.h" />
-    <ClInclude Include="SeqTitle.h" />
     <ClInclude Include="SharedObj.h" />
-    <ClInclude Include="Sprite.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="res\shader\animation_mesh_shader.fx">

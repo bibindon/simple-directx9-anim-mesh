@@ -10,9 +10,7 @@
 #include <dinput.h>
 #include  <string>
 #include "Mesh.h"
-#include "Sprite.h"
 #include "AnimMesh.h"
-#include "SeqTitle.h"
 #include "SeqBattle.h"
 
 class MainWindow
@@ -37,10 +35,7 @@ private:
 
     Mesh* m_Mesh1 { nullptr };
     LPDIRECTINPUT8 m_directInput { nullptr };
-    Sprite* m_sprite { nullptr };
 
-    eSequence m_sequence { eSequence::TITLE };
-    SeqTitle* m_seqTitle { nullptr };
     SeqBattle* m_seqBattle { nullptr };
 };
 

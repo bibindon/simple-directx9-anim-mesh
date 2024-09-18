@@ -25,14 +25,6 @@ inline void SAFE_RELEASE(T*& p)
     }
 }
 
-enum class eSequence
-{
-    TITLE,
-    OPENING,
-    BATTLE,
-    ENDING
-};
-
 class Common
 {
 public:

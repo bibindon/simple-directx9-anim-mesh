@@ -129,15 +129,13 @@ MainWindow::MainWindow(const HINSTANCE& hInstance)
     D3DXVECTOR3 c = D3DXVECTOR3(0, 0, 0);
     m_Mesh1 = new Mesh("res\\model\\tiger\\tiger.x", b, c, 1.0f);
 
-    m_seqTitle = new SeqTitle();
-
     // ウィンドウ表示
     ShowWindow(m_hWnd, SW_SHOW);
+    m_seqBattle = new SeqBattle();
 }
 
 MainWindow::~MainWindow()
 {
-    SAFE_DELETE(m_sprite);
     SharedObj::Finalize();
     m_D3D->Release();
 }
@@ -191,25 +189,8 @@ int MainWindow::MainLoop()
         {
             MessageBox(NULL, TEXT("aaa"), TEXT("bbb"), 0);
         }
-        if (Mouse::IsDownLeft())
-        {
-            m_sprite = new Sprite("res\\image\\board.png");
-        }
 
-        if (m_sequence == eSequence::TITLE)
-        {
-            m_seqTitle->Update(&m_sequence);
-            if (m_sequence == eSequence::BATTLE)
-            {
-                SAFE_DELETE(m_seqTitle);
-                m_seqBattle = new SeqBattle();
-                m_seqBattle->Update(&m_sequence);
-            }
-        }
-        else if (m_sequence == eSequence::BATTLE)
-        {
-            m_seqBattle->Update(&m_sequence);
-        }
+        m_seqBattle->Update();
 
         D3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(40, 40, 80),
             1.0f, 0);
@@ -245,22 +226,8 @@ int MainWindow::MainLoop()
         D3DDevice->SetTransform(D3DTS_VIEW, &View);
         D3DDevice->SetTransform(D3DTS_PROJECTION, &Persp);
 
-
-        if (m_sequence == eSequence::TITLE)
-        {
-            m_seqTitle->Render();
-        }
-        else if (m_sequence == eSequence::BATTLE)
-        {
-            m_seqBattle->Render();
-        }
+        m_seqBattle->Render();
         m_Mesh1->Render();
-
-        if (m_sprite != nullptr)
-        {
-            D3DXVECTOR3 pos { 0.0f, 0.0f, 0.0f };
-            m_sprite->Render(pos);
-        }
 
         D3DDevice->EndScene();
         D3DDevice->Present(NULL, NULL, NULL, NULL);

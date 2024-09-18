@@ -20,7 +20,7 @@ SeqBattle::~SeqBattle()
 {
 }
 
-void SeqBattle::Update(eSequence* sequence)
+void SeqBattle::Update()
 {
     D3DXVECTOR3 pos = m_player->GetPos();
     float radian = Camera::GetRadian();
