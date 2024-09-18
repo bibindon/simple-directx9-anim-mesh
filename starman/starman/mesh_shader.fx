@@ -1,7 +1,6 @@
-float4x4 g_world;
 float4x4 g_world_view_projection;
-float4 g_light_normal;
-float g_light_brightness;
+float4 g_light_normal = {1.f, 1.f, 1.f, 1.f};
+float g_light_brightness = 0.5f;
 float4 g_diffuse;
 float4 g_ambient = { 0.2f, 0.2f, 0.2f, 0.0f };
 texture g_mesh_texture;

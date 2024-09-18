@@ -1,5 +1,4 @@
 #include "Mesh.h"
-#include "Light.h"
 #include "Common.h"
 #include "Camera.h"
 
@@ -164,10 +163,6 @@ Mesh::~Mesh()
 
 void Mesh::Render()
 {
-    D3DXVECTOR4 normal = Light::GetLightNormal();
-    m_D3DEffect->SetVector(m_lightNormalHandle, &normal);
-    m_D3DEffect->SetFloat(m_brightnessHandle, Light::GetBrightness());
-
     D3DXMATRIX worldViewProjMatrix { };
     D3DXMatrixIdentity(&worldViewProjMatrix);
     {
