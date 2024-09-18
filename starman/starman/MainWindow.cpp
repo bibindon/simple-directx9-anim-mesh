@@ -2,8 +2,6 @@
 #include <exception>
 #include "KeyBoard.h"
 #include "Mouse.h"
-#include "BGM.h"
-#include "SoundEffect.h"
 #include "Common.h"
 #include "Camera.h"
 #include "SharedObj.h"
@@ -126,8 +124,6 @@ MainWindow::MainWindow(const HINSTANCE& hInstance)
 
     KeyBoard::Init(m_directInput, m_hWnd);
     Mouse::Init(m_directInput, m_hWnd);
-    BGM::initialize(m_hWnd);
-    SoundEffect::initialize(m_hWnd);
 
     D3DXVECTOR3 b = D3DXVECTOR3(0, 1, 0);
     D3DXVECTOR3 c = D3DXVECTOR3(0, 0, 0);
@@ -141,8 +137,6 @@ MainWindow::MainWindow(const HINSTANCE& hInstance)
 
 MainWindow::~MainWindow()
 {
-    BGM::finalize();
-    SoundEffect::finalize();
     SAFE_DELETE(m_sprite);
     SharedObj::Finalize();
     m_D3D->Release();
@@ -191,20 +185,14 @@ int MainWindow::MainLoop()
         }
         if (KeyBoard::IsDown(DIK_Q))
         {
-            //BGM::get_ton()->load("res\\sound\\title.wav");
-//            SoundEffect::get_ton()->load("res\\sound\\damage01.wav");
-//            MessageBox(NULL, TEXT("aaa"), TEXT("bbb"), 0);
             PostMessage(m_hWnd, WM_CLOSE, 0, 0);
         }
         if (KeyBoard::IsDown(DIK_E))
         {
-            //BGM::get_ton()->play();
-            SoundEffect::get_ton()->play("res\\sound\\damage01.wav");
             MessageBox(NULL, TEXT("aaa"), TEXT("bbb"), 0);
         }
         if (Mouse::IsDownLeft())
         {
-//            MessageBox(NULL, TEXT("aaaaaaa"), TEXT("aaaaaaa"), 0);
             m_sprite = new Sprite("res\\image\\board.png");
         }
 
