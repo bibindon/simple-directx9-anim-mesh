@@ -38,7 +38,6 @@ AnimMesh::AnimMesh(
     const float& scale)
     : m_allocator { new AnimMeshAllocator { xFilename } }
     , m_frameRoot { nullptr, frame_root_deleter_object { m_allocator } }
-    , m_rotationMatrix { D3DMATRIX { } }
     , m_position { position }
     , m_rotation { rotation }
     , m_centerPos { 0.0f, 0.0f, 0.0f }
@@ -57,13 +56,6 @@ AnimMesh::AnimMesh(
     {
         throw std::exception("Failed to create an effect file.");
     }
-
-    m_worldHandle = m_D3DEffect->GetParameterByName(nullptr, "g_world");
-    m_worldViewProjHandle = m_D3DEffect->GetParameterByName(nullptr, "g_world_view_projection");
-    m_lightNormalHandle = m_D3DEffect->GetParameterByName(nullptr, "g_light_normal");
-    m_brightnessHandle = m_D3DEffect->GetParameterByName(nullptr, "g_light_brightness");
-    m_meshTextureHandle = m_D3DEffect->GetParameterByName(nullptr, "g_mesh_texture");
-    m_diffuseHandle = m_D3DEffect->GetParameterByName(nullptr, "g_diffuse");
 
     LPD3DXFRAME temp_root_frame { nullptr };
     LPD3DXANIMATIONCONTROLLER temp_animation_controller { nullptr };
@@ -179,36 +171,30 @@ void AnimMesh::RenderMeshContainer(
 
     D3DXMATRIX worldViewProjMatrix { frame->m_combinedMatrix };
 
-    m_D3DEffect->SetMatrix(m_worldHandle, &worldViewProjMatrix);
-
     worldViewProjMatrix *= m_viewMatrix;
     worldViewProjMatrix *= m_projMatrix;
 
-    m_D3DEffect->SetMatrix(m_worldViewProjHandle, &worldViewProjMatrix);
+    m_D3DEffect->SetMatrix("g_world_view_proj", &worldViewProjMatrix);
 
     m_D3DEffect->Begin(nullptr, 0);
 
-    if (FAILED(m_D3DEffect->BeginPass(0)))
+    if (m_D3DEffect->BeginPass(0) == S_OK)
     {
-        m_D3DEffect->End();
-        //THROW_WITH_TRACE("Failed 'BeginPass' function.");
-        // TODO return false;
-    }
+        AnimMeshContainer* meshContainer { static_cast<AnimMeshContainer*>(meshContainerBase) };
 
-    AnimMeshContainer* meshContainer { static_cast<AnimMeshContainer*>(meshContainerBase) };
+        for (DWORD i = 0; i < meshContainer->NumMaterials; ++i)
+        {
+            D3DXVECTOR4 color {
+                meshContainer->pMaterials[i].MatD3D.Diffuse.r,
+                meshContainer->pMaterials[i].MatD3D.Diffuse.g,
+                meshContainer->pMaterials[i].MatD3D.Diffuse.b,
+                meshContainer->pMaterials[i].MatD3D.Diffuse.a };
+            m_D3DEffect->SetVector("g_diffuse", &color);
+            m_D3DEffect->SetTexture("g_mesh_texture", meshContainer->m_vecTexture.at(i));
 
-    for (DWORD i = 0; i < meshContainer->NumMaterials; ++i)
-    {
-        D3DXVECTOR4 color {
-            meshContainer->pMaterials[i].MatD3D.Diffuse.r,
-            meshContainer->pMaterials[i].MatD3D.Diffuse.g,
-            meshContainer->pMaterials[i].MatD3D.Diffuse.b,
-            meshContainer->pMaterials[i].MatD3D.Diffuse.a };
-        m_D3DEffect->SetVector(m_diffuseHandle, &color);
-        m_D3DEffect->SetTexture(m_meshTextureHandle, meshContainer->m_vecTexture.at(i));
-
-        m_D3DEffect->CommitChanges();
-        meshContainer->MeshData.pMesh->DrawSubset(i);
+            m_D3DEffect->CommitChanges();
+            meshContainer->MeshData.pMesh->DrawSubset(i);
+        }
     }
     m_D3DEffect->EndPass();
     m_D3DEffect->End();

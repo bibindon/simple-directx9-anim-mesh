@@ -35,16 +35,12 @@ private:
     const std::string SHADER_FILENAME { "animation_mesh_shader.fx" };
     std::shared_ptr<AnimMeshAllocator> m_allocator;
     std::unique_ptr<D3DXFRAME, frame_root_deleter_object> m_frameRoot;
-    D3DXMATRIX m_rotationMatrix;
     D3DXMATRIX m_viewMatrix;
     D3DXMATRIX m_projMatrix;
 
     D3DXVECTOR3 m_centerPos;
 
     LPD3DXEFFECT m_D3DEffect { nullptr };
-
-    D3DXHANDLE m_worldHandle { nullptr };
-    D3DXHANDLE m_worldViewProjHandle { nullptr };
 
     void UpdateFrameMatrix(const LPD3DXFRAME, const LPD3DXMATRIX);
     void RenderFrame(const LPD3DXFRAME);
@@ -58,8 +54,6 @@ private:
 
     D3DXHANDLE m_meshTextureHandle { nullptr };
     D3DXHANDLE m_diffuseHandle { nullptr };
-    D3DXHANDLE m_lightNormalHandle { nullptr };
-    D3DXHANDLE m_brightnessHandle { nullptr };
 
     std::unique_ptr<animation_strategy> m_animationStrategy;
 };

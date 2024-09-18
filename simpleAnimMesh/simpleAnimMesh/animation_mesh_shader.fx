@@ -1,4 +1,4 @@
-float4x4 g_world_view_projection;
+float4x4 g_world_view_proj;
 float4 g_light_normal = {-1.f, -1.f, -1.f, 1.f};
 float g_light_brightness = 0.5f;
 float4 g_diffuse;
@@ -14,7 +14,7 @@ void vertex_shader(
     out float4 out_diffuse  : COLOR0,
     out float4 out_texture  : TEXCOORD0)
 {
-    out_position  = mul(in_position, g_world_view_projection);
+    out_position  = mul(in_position, g_world_view_proj);
     in_normal = normalize(in_normal);
 
     float light_intensity = g_light_brightness * dot(in_normal, g_light_normal);
