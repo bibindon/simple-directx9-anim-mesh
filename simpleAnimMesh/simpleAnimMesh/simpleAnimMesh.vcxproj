@@ -164,8 +164,8 @@
     <ClInclude Include="Mesh.h" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="animation_mesh_shader.fx" />
-    <FxCompile Include="mesh_shader.fx" />
+    <FxCompile Include="animMeshShader.fx" />
+    <FxCompile Include="meshShader.fx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

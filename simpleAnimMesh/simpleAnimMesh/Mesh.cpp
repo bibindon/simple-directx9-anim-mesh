@@ -170,7 +170,7 @@ void Mesh::Render(const D3DXMATRIX& view, const D3DXMATRIX& proj)
     matWorldViewProj *= view;
     matWorldViewProj *= proj;
 
-    m_D3DEffect->SetMatrix("g_world_view_proj", &matWorldViewProj);
+    m_D3DEffect->SetMatrix("g_worldViewProj", &matWorldViewProj);
 
     m_D3DEffect->Begin(nullptr, 0);
 
@@ -183,7 +183,7 @@ void Mesh::Render(const D3DXMATRIX& view, const D3DXMATRIX& proj)
                                     m_vecColor.at(i).b,
                                     m_vecColor.at(i).a };
             m_D3DEffect->SetVector("g_diffuse", &vec4Color);
-            m_D3DEffect->SetTexture("g_mesh_texture", m_vecTexture.at(i));
+            m_D3DEffect->SetTexture("g_tex", m_vecTexture.at(i));
             m_D3DEffect->CommitChanges();
             m_D3DMesh->DrawSubset(i);
         }

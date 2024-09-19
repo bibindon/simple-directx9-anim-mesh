@@ -84,14 +84,14 @@ void AnimController::SetDefaultAnim(const std::string& animation_name)
     SetAnim(m_defaultAnim);
 }
 
-void AnimController::SetAnimConfig(const std::string& animation_name,
+void AnimController::SetAnimConfig(const std::string& animName,
                                    const bool& loop,
                                    const float& duration)
 {
-    m_animConfigMap.emplace(animation_name, AnimConfig { loop, duration });
+    m_animConfigMap.emplace(animName, AnimConfig { loop, duration });
 }
 
-bool AnimController::is_playing()
+bool AnimController::isPlaying()
 {
     return m_isPlaying;
 }
@@ -203,7 +203,7 @@ void AnimMesh::SetRotate(const D3DXVECTOR3& rotate)
 
 void AnimMesh::UpdateFrameMatrix(const LPD3DXFRAME frameBase, const LPD3DXMATRIX parentMatrix)
 {
-    AnimMeshFrame* frame { static_cast<AnimMeshFrame*>(frameBase) };
+    AnimMeshFrame* frame = static_cast<AnimMeshFrame*>(frameBase);
     if (parentMatrix != nullptr)
     {
         frame->m_combinedMatrix = frame->TransformationMatrix * (*parentMatrix);
@@ -226,11 +226,11 @@ void AnimMesh::UpdateFrameMatrix(const LPD3DXFRAME frameBase, const LPD3DXMATRIX
 void AnimMesh::RenderFrame(const LPD3DXFRAME frame)
 {
     {
-        LPD3DXMESHCONTAINER mesh_container { frame->pMeshContainer };
-        while (mesh_container != nullptr)
+        LPD3DXMESHCONTAINER meshContainer { frame->pMeshContainer };
+        while (meshContainer != nullptr)
         {
-            RenderMeshContainer(mesh_container, frame);
-            mesh_container = mesh_container->pNextMeshContainer;
+            RenderMeshContainer(meshContainer, frame);
+            meshContainer = meshContainer->pNextMeshContainer;
         }
     }
 
@@ -244,17 +244,17 @@ void AnimMesh::RenderFrame(const LPD3DXFRAME frame)
     }
 }
 
-void AnimMesh::RenderMeshContainer(
-    const LPD3DXMESHCONTAINER meshContainerBase, const LPD3DXFRAME frameBase)
+void AnimMesh::RenderMeshContainer(const LPD3DXMESHCONTAINER meshContainerBase,
+                                   const LPD3DXFRAME frameBase)
 {
     AnimMeshFrame* frame = static_cast<AnimMeshFrame*>(frameBase);
 
-    D3DXMATRIX worldViewProjMatrix = frame->m_combinedMatrix;
+    D3DXMATRIX matWorldViewProj = frame->m_combinedMatrix;
 
-    worldViewProjMatrix *= m_viewMatrix;
-    worldViewProjMatrix *= m_projMatrix;
+    matWorldViewProj *= m_viewMatrix;
+    matWorldViewProj *= m_projMatrix;
 
-    m_D3DEffect->SetMatrix("g_world_view_proj", &worldViewProjMatrix);
+    m_D3DEffect->SetMatrix("g_worldViewProj", &matWorldViewProj);
 
     m_D3DEffect->Begin(nullptr, 0);
 
@@ -269,7 +269,7 @@ void AnimMesh::RenderMeshContainer(
                                meshContainer->pMaterials[i].MatD3D.Diffuse.b,
                                meshContainer->pMaterials[i].MatD3D.Diffuse.a };
             m_D3DEffect->SetVector("g_diffuse", &color);
-            m_D3DEffect->SetTexture("g_mesh_texture", meshContainer->m_vecTexture.at(i));
+            m_D3DEffect->SetTexture("g_tex", meshContainer->m_vecTexture.at(i));
 
             m_D3DEffect->CommitChanges();
             meshContainer->MeshData.pMesh->DrawSubset(i);

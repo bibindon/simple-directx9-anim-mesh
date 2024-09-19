@@ -43,10 +43,10 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="mesh_shader.fx">
+    <FxCompile Include="meshShader.fx">
       <Filter>リソース ファイル</Filter>
     </FxCompile>
-    <FxCompile Include="animation_mesh_shader.fx">
+    <FxCompile Include="animMeshShader.fx">
       <Filter>リソース ファイル</Filter>
     </FxCompile>
   </ItemGroup>

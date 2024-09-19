@@ -21,7 +21,7 @@ public:
 
 private:
 
-    const std::string SHADER_FILENAME = "mesh_shader.fx";
+    const std::string SHADER_FILENAME = "meshShader.fx";
     std::string m_meshName = "";
 
     LPD3DXMESH m_D3DMesh = nullptr;

@@ -1,4 +1,3 @@
-// TODO Remove smart pointer
 #pragma once
 
 #include "AnimMeshAlloc.h"
@@ -24,7 +23,7 @@ public:
     void SetAnimConfig(const std::string& animation_name,
                        const bool& loop,
                        const float& duration);
-    bool is_playing();
+    bool isPlaying();
 
 private:
 
@@ -66,7 +65,7 @@ private:
     void RenderMeshContainer(const LPD3DXMESHCONTAINER, const LPD3DXFRAME);
     void ReleaseMeshAllocator(const LPD3DXFRAME);
 
-    const std::string SHADER_FILENAME = "animation_mesh_shader.fx";
+    const std::string SHADER_FILENAME = "animMeshShader.fx";
     std::string m_meshName = "";
 
     LPD3DXEFFECT m_D3DEffect = nullptr;
