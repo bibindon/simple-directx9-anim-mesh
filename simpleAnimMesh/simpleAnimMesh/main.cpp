@@ -22,10 +22,10 @@ Mesh* m_Mesh1 { nullptr };
 AnimMesh* m_AnimMesh2 = { nullptr };
 
 const D3DXVECTOR3 UPWARD { 0.0f, 1.0f, 0.0f };
-D3DXVECTOR3 g_eyePos { 0.0f, 3.0f, -2.0f };
-D3DXVECTOR3 g_lookAtPos { 0.0f, 0.0f, 0.0f };
+D3DXVECTOR3 g_eyePos { 0.0f, 3.0f, -1.0f };
+D3DXVECTOR3 g_lookAtPos { 0.0f, 1.0f, 0.0f };
 float g_viewAngle { D3DX_PI / 4 };
-float g_radian { D3DX_PI*3 / 4 };
+float g_radian { D3DX_PI * 3 / 4 };
 
 D3DXMATRIX GetViewMatrix()
 {
@@ -52,8 +52,8 @@ D3DXMATRIX GetProjMatrix()
 void Update()
 {
     g_radian += 1/100.f;
-    g_eyePos.x = g_lookAtPos.x + std::sin(g_radian)*10;
-    g_eyePos.z = g_lookAtPos.z + std::cos(g_radian)*10;
+    g_eyePos.x = g_lookAtPos.x + std::sin(g_radian)*4;
+    g_eyePos.z = g_lookAtPos.z + std::cos(g_radian)*4;
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT mes, WPARAM wParam, LPARAM lParam)

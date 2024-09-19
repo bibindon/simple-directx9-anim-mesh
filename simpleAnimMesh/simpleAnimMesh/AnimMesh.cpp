@@ -95,7 +95,6 @@ bool AnimController::is_playing()
     return m_isPlaying;
 }
 
-
 void AnimMesh::frame_root_deleter_object::operator()(const LPD3DXFRAME frameRoot)
 {
     release_mesh_allocator(frameRoot);
