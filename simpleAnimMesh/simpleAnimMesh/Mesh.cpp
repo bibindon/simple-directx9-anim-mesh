@@ -1,15 +1,11 @@
 #include "Mesh.h"
 #include "Common.h"
 
-using std::string;
-using std::vector;
-
-Mesh::Mesh(
-    const LPDIRECT3DDEVICE9 D3DDevice,
-    const string& xFilename,
-    const D3DXVECTOR3& position,
-    const D3DXVECTOR3& rotation,
-    const float& scale)
+Mesh::Mesh(const LPDIRECT3DDEVICE9 D3DDevice,
+           const std::string& xFilename,
+           const D3DXVECTOR3& position,
+           const D3DXVECTOR3& rotation,
+           const float& scale)
     : m_meshName { xFilename }
     , m_pos { position }
     , m_rotate { rotation }
@@ -17,32 +13,30 @@ Mesh::Mesh(
 {
 
     HRESULT result { 0 };
-    D3DXCreateEffectFromFile(
-        D3DDevice,
-        SHADER_FILENAME.c_str(),
-        nullptr,
-        nullptr,
-        0,
-        nullptr,
-        &m_D3DEffect,
-        nullptr);
+    D3DXCreateEffectFromFile(D3DDevice,
+                             SHADER_FILENAME.c_str(),
+                             nullptr,
+                             nullptr,
+                             0,
+                             nullptr,
+                             &m_D3DEffect,
+                             nullptr);
     if (FAILED(result))
     {
         throw std::exception("Failed to create an effect file.");
     }
 
-    LPD3DXBUFFER adjacencyBuffer { nullptr };
-    LPD3DXBUFFER materialBuffer { nullptr };
+    LPD3DXBUFFER adjacencyBuffer = nullptr;
+    LPD3DXBUFFER materialBuffer = nullptr;
 
-    result = D3DXLoadMeshFromX(
-        xFilename.c_str(),
-        D3DXMESH_SYSTEMMEM,
-        D3DDevice,
-        &adjacencyBuffer,
-        &materialBuffer,
-        nullptr,
-        &m_materialCount,
-        &m_D3DMesh);
+    result = D3DXLoadMeshFromX(xFilename.c_str(),
+                               D3DXMESH_SYSTEMMEM,
+                               D3DDevice,
+                               &adjacencyBuffer,
+                               &materialBuffer,
+                               nullptr,
+                               &m_materialCount,
+                               &m_D3DMesh);
 
     if (FAILED(result))
     {
@@ -94,12 +88,12 @@ Mesh::Mesh(
         throw std::exception("Failed 'D3DXComputeNormals' function.");
     }
 
-    result = m_D3DMesh->OptimizeInplace(
-        D3DXMESHOPT_COMPACT | D3DXMESHOPT_ATTRSORT | D3DXMESHOPT_VERTEXCACHE,
-        wordBuffer,
-        nullptr,
-        nullptr,
-        nullptr);
+    result = m_D3DMesh->OptimizeInplace(D3DXMESHOPT_COMPACT | D3DXMESHOPT_ATTRSORT |
+                                        D3DXMESHOPT_VERTEXCACHE,
+                                        wordBuffer,
+                                        nullptr,
+                                        nullptr,
+                                        nullptr);
 
     SAFE_RELEASE(adjacencyBuffer);
 
@@ -109,10 +103,10 @@ Mesh::Mesh(
     }
 
     m_vecColor.insert(begin(m_vecColor), m_materialCount, D3DCOLORVALUE { });
-    vector<LPDIRECT3DTEXTURE9> tempVecTexture { m_materialCount };
+    std::vector<LPDIRECT3DTEXTURE9> tempVecTexture { m_materialCount };
     m_vecTexture.swap(tempVecTexture);
 
-    D3DXMATERIAL* materials { static_cast<D3DXMATERIAL*>(materialBuffer->GetBufferPointer()) };
+    D3DXMATERIAL* materials = static_cast<D3DXMATERIAL*>(materialBuffer->GetBufferPointer());
 
     std::string xFileDir = m_meshName;
     std::size_t lastPos = xFileDir.find_last_of("\\");
@@ -125,11 +119,10 @@ Mesh::Mesh(
         {
             std::string texPath = xFileDir;
             texPath += materials[i].pTextureFilename;
-            LPDIRECT3DTEXTURE9 tempTexture { nullptr };
-            if (FAILED(D3DXCreateTextureFromFile(
-                D3DDevice,
-                texPath.c_str(),
-                &tempTexture)))
+            LPDIRECT3DTEXTURE9 tempTexture = nullptr;
+            if (FAILED(D3DXCreateTextureFromFile(D3DDevice,
+                                                 texPath.c_str(),
+                                                 &tempTexture)))
             {
                 throw std::exception("texture file is not found.");
             }
@@ -157,47 +150,45 @@ Mesh::~Mesh()
 
 void Mesh::Render(const D3DXMATRIX& view, const D3DXMATRIX& proj)
 {
-    D3DXMATRIX worldViewProjMatrix { };
-    D3DXMatrixIdentity(&worldViewProjMatrix);
+    D3DXMATRIX matWorldViewProj { };
+    D3DXMatrixIdentity(&matWorldViewProj);
     {
         D3DXMATRIX mat { };
 
         D3DXMatrixTranslation(&mat, -m_centerPos.x, -m_centerPos.y, -m_centerPos.z);
-        worldViewProjMatrix *= mat;
+        matWorldViewProj *= mat;
 
         D3DXMatrixScaling(&mat, m_scale, m_scale, m_scale);
-        worldViewProjMatrix *= mat;
+        matWorldViewProj *= mat;
 
         D3DXMatrixRotationYawPitchRoll(&mat, m_rotate.x, m_rotate.y, m_rotate.z);
-        worldViewProjMatrix *= mat;
+        matWorldViewProj *= mat;
 
         D3DXMatrixTranslation(&mat, m_pos.x, m_pos.y, m_pos.z);
-        worldViewProjMatrix *= mat;
+        matWorldViewProj *= mat;
     }
-    worldViewProjMatrix *= view;
-    worldViewProjMatrix *= proj;
+    matWorldViewProj *= view;
+    matWorldViewProj *= proj;
 
-    m_D3DEffect->SetMatrix("g_world_view_proj", &worldViewProjMatrix);
+    m_D3DEffect->SetMatrix("g_world_view_proj", &matWorldViewProj);
 
     m_D3DEffect->Begin(nullptr, 0);
 
-    HRESULT result { S_FALSE };
-    if (FAILED(result = m_D3DEffect->BeginPass(0)))
+    if (SUCCEEDED(m_D3DEffect->BeginPass(0)))
     {
-        m_D3DEffect->End();
-        throw std::exception("Failed 'BeginPass' function.");
+        for (DWORD i = 0; i < m_materialCount; ++i)
+        {
+            D3DXVECTOR4 vec4Color { m_vecColor.at(i).r,
+                                    m_vecColor.at(i).g,
+                                    m_vecColor.at(i).b,
+                                    m_vecColor.at(i).a };
+            m_D3DEffect->SetVector("g_diffuse", &vec4Color);
+            m_D3DEffect->SetTexture("g_mesh_texture", m_vecTexture.at(i));
+            m_D3DEffect->CommitChanges();
+            m_D3DMesh->DrawSubset(i);
+        }
+        m_D3DEffect->EndPass();
     }
-
-    for (DWORD i = 0; i < m_materialCount; ++i)
-    {
-        D3DXVECTOR4 vec4Color {
-            m_vecColor.at(i).r, m_vecColor.at(i).g, m_vecColor.at(i).b, m_vecColor.at(i).a};
-        m_D3DEffect->SetVector("g_diffuse", &vec4Color);
-        m_D3DEffect->SetTexture("g_mesh_texture", m_vecTexture.at(i));
-        m_D3DEffect->CommitChanges();
-        m_D3DMesh->DrawSubset(i);
-    }
-    m_D3DEffect->EndPass();
     m_D3DEffect->End();
 }
 
