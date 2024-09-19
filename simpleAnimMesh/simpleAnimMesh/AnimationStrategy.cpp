@@ -1,91 +1,91 @@
 #include "AnimationStrategy.h"
 
- animation_strategy::animation_strategy(LPD3DXANIMATIONCONTROLLER controller)
-        : default_animation_ { "" },
-        animation_time_ { },
-        playing_animation_ { "" }
+ AnimController::AnimController(LPD3DXANIMATIONCONTROLLER controller)
+        : m_defaultAnim { "" },
+        m_animTime { },
+        m_currentAnim { "" }
 {
-    SAFE_RELEASE(animation_controller_);
-    animation_controller_ = controller;
-    DWORD animation_count { animation_controller_->GetNumAnimationSets() };
+    SAFE_RELEASE(m_animController);
+    m_animController = controller;
+    DWORD animation_count { m_animController->GetNumAnimationSets() };
 
     std::vector<LPD3DXANIMATIONSET> animation_sets(animation_count);
 
-    animation_sets_.swap(animation_sets);
+    m_animSets.swap(animation_sets);
 
     for (DWORD i { 0 }; i < animation_count; ++i)
     {
         LPD3DXANIMATIONSET temp_animation_set { nullptr };
-        animation_controller_->GetAnimationSet(i, &temp_animation_set);
-        SAFE_RELEASE(animation_sets_.at(i));
-        animation_sets_.at(i) = temp_animation_set;
+        m_animController->GetAnimationSet(i, &temp_animation_set);
+        SAFE_RELEASE(m_animSets.at(i));
+        m_animSets.at(i) = temp_animation_set;
     }
 }
 
-void animation_strategy::set_animation(const std::string& animation_set)
+void AnimController::SetAnim(const std::string& animation_set)
 {
     std::vector<LPD3DXANIMATIONSET>::const_iterator kit;
 
     kit = std::find_if(
-        animation_sets_.cbegin(), animation_sets_.cend(),
+        m_animSets.cbegin(), m_animSets.cend(),
         [&](const LPD3DXANIMATIONSET& a)
         {
             return animation_set == a->GetName();
         });
 
-    if (animation_sets_.cend() == kit)
+    if (m_animSets.cend() == kit)
     {
         // TODO return error
     //    THROW_WITH_TRACE("An illegal animation set was sent.: " + animation_set);
     }
 
-    animation_controller_->SetTrackAnimationSet(0, *kit);
-    animation_controller_->SetTrackPosition(0, -1.001f / 60);
-    animation_time_ = 0.f;
+    m_animController->SetTrackAnimationSet(0, *kit);
+    m_animController->SetTrackPosition(0, -1.001f / 60);
+    m_animTime = 0.f;
 
-    if (animation_configs_.find(animation_set) == animation_configs_.end())
+    if (m_animConfigMap.find(animation_set) == m_animConfigMap.end())
     {
         return;
     }
-    if (animation_set != default_animation_ &&
-        !animation_configs_.at(animation_set).loop_)
+    if (animation_set != m_defaultAnim &&
+        !m_animConfigMap.at(animation_set).loop)
     {
-        is_playing_ = true;
-        playing_animation_ = animation_set;
+        m_isPlaying = true;
+        m_currentAnim = animation_set;
     }
 };
 
-void animation_strategy::update()
+void AnimController::Update()
 {
-    animation_time_ += 1.f/60;
-    animation_controller_->SetTrackPosition(0, 0.f);
-    animation_controller_->AdvanceTime(animation_time_, nullptr);
-    if (is_playing_)
+    m_animTime += 1.f/60;
+    m_animController->SetTrackPosition(0, 0.f);
+    m_animController->AdvanceTime(m_animTime, nullptr);
+    if (m_isPlaying)
     {
-        float duration { animation_configs_.at(playing_animation_).duration_ };
-        if (animation_time_ + 0.001f >= duration)
+        float duration { m_animConfigMap.at(m_currentAnim).duration };
+        if (m_animTime + 0.001f >= duration)
         {
-            set_animation(default_animation_);
-            is_playing_ = false;
-            animation_time_ = 0;
+            SetAnim(m_defaultAnim);
+            m_isPlaying = false;
+            m_animTime = 0;
         }
     }
 };
 
-void animation_strategy::set_default_animation(const std::string& animation_name)
+void AnimController::SetDefaultAnim(const std::string& animation_name)
 {
-    default_animation_ = animation_name;
-    set_animation(default_animation_);
+    m_defaultAnim = animation_name;
+    SetAnim(m_defaultAnim);
 }
 
-void animation_strategy::set_animation_config(
+void AnimController::SetAnimConfig(
     const std::string& animation_name, const bool& loop, const float& duration)
 {
-    animation_configs_.emplace(animation_name, animation_config { loop, duration });
+    m_animConfigMap.emplace(animation_name, AnimConfig { loop, duration });
 }
 
-bool animation_strategy::is_playing()
+bool AnimController::is_playing()
 {
-    return is_playing_;
+    return m_isPlaying;
 }
 

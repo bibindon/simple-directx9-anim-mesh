@@ -8,33 +8,33 @@
 #include <unordered_map>
 #include "Common.h"
 
-class animation_strategy
+class AnimController
 {
 public:
-    animation_strategy(LPD3DXANIMATIONCONTROLLER controller);
-    void set_animation(const std::string& animation_set);
-    void update();
-    void set_default_animation(const std::string& animation_name);
-    void set_animation_config(
+    AnimController(LPD3DXANIMATIONCONTROLLER controller);
+    void SetAnim(const std::string& animation_set);
+    void Update();
+    void SetDefaultAnim(const std::string& animation_name);
+    void SetAnimConfig(
         const std::string& animation_name,
         const bool& loop,
         const float& duration);
     bool is_playing();
 
 private:
-    bool is_playing_ { false };
-    std::vector<LPD3DXANIMATIONSET> animation_sets_;
-    LPD3DXANIMATIONCONTROLLER animation_controller_ { nullptr };
-    std::string default_animation_;
-    float animation_time_;
-    std::string playing_animation_;
+    bool m_isPlaying { false };
+    std::vector<LPD3DXANIMATIONSET> m_animSets;
+    LPD3DXANIMATIONCONTROLLER m_animController { nullptr };
+    std::string m_defaultAnim;
+    float m_animTime;
+    std::string m_currentAnim;
 
-    struct animation_config
+    struct AnimConfig
     {
-        bool loop_ { true };
-        float duration_ { 1.0f };
+        bool loop { true };
+        float duration { 1.0f };
     };
-    std::unordered_map<std::string, animation_config> animation_configs_;
+    std::unordered_map<std::string, AnimConfig> m_animConfigMap;
 };
 
 

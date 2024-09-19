@@ -157,7 +157,6 @@
     <ClCompile Include="AnimMeshAlloc.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MainWindow.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Common.cpp" />
   </ItemGroup>
@@ -167,7 +166,6 @@
     <ClInclude Include="AnimMeshAlloc.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Common.h" />
-    <ClInclude Include="MainWindow.h" />
     <ClInclude Include="Mesh.h" />
   </ItemGroup>
   <ItemGroup>

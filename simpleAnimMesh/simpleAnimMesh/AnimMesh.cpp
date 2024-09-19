@@ -75,7 +75,7 @@ AnimMesh::AnimMesh(
     }
     // lazy initialization 
     m_frameRoot.reset(temp_root_frame);
-    m_animationStrategy.reset(new animation_strategy { temp_animation_controller });
+    m_animController.reset(new AnimController { temp_animation_controller });
 
     m_scale = scale;
 }
@@ -89,7 +89,7 @@ void AnimMesh::Render()
     m_viewMatrix = Camera::GetViewMatrix();
     m_projMatrix = Camera::GetProjMatrix();
 
-    m_animationStrategy->update();
+    m_animController->Update();
 
     D3DXMATRIX worldMatrix { };
     D3DXMatrixIdentity(&worldMatrix);

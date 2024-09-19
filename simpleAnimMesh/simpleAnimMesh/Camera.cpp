@@ -1,4 +1,5 @@
 #include "Camera.h"
+
 #include <cmath>
 
 const D3DXVECTOR3 Camera::UPWARD { 0.0f, 1.0f, 0.0f };

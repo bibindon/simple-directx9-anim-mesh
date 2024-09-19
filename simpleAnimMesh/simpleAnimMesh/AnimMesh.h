@@ -46,15 +46,11 @@ private:
     void RenderFrame(const LPD3DXFRAME);
     void RenderMeshContainer(const LPD3DXMESHCONTAINER, const LPD3DXFRAME);
 
-
     D3DXVECTOR3 m_position;
     D3DXVECTOR3 m_rotation;
     float m_scale { 1.0f };
     std::string m_meshName;
 
-    D3DXHANDLE m_meshTextureHandle { nullptr };
-    D3DXHANDLE m_diffuseHandle { nullptr };
-
-    std::unique_ptr<animation_strategy> m_animationStrategy;
+    std::unique_ptr<AnimController> m_animController;
 };
 
