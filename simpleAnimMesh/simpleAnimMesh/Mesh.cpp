@@ -1,6 +1,5 @@
 #include "Mesh.h"
 #include "Common.h"
-#include "Camera.h"
 
 using std::string;
 using std::vector;
@@ -155,7 +154,7 @@ Mesh::~Mesh()
     SAFE_RELEASE(m_D3DEffect);
 }
 
-void Mesh::Render()
+void Mesh::Render(const D3DXMATRIX& view, const D3DXMATRIX& proj)
 {
     D3DXMATRIX worldViewProjMatrix { };
     D3DXMatrixIdentity(&worldViewProjMatrix);
@@ -174,8 +173,8 @@ void Mesh::Render()
         D3DXMatrixTranslation(&mat, m_pos.x, m_pos.y, m_pos.z);
         worldViewProjMatrix *= mat;
     }
-    worldViewProjMatrix *= Camera::GetViewMatrix();
-    worldViewProjMatrix *= Camera::GetProjMatrix();
+    worldViewProjMatrix *= view;
+    worldViewProjMatrix *= proj;
 
     m_D3DEffect->SetMatrix("g_world_view_proj", &worldViewProjMatrix);
 

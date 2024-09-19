@@ -7,20 +7,53 @@
 #pragma comment(lib, "d3dx9.lib")
 #endif
 
-#include "Camera.h"
 #include "Mesh.h"
 #include "AnimMesh.h"
 
 #include <windows.h>
 #include <string>
 #include <d3dx9.h>
-//#include "MainWindow.h"
 
 const std::string TITLE = "simple anim mesh";
 HWND m_hWnd;
 LPDIRECT3D9 m_D3D;
 Mesh* m_Mesh1 { nullptr };
 AnimMesh* m_AnimMesh2 = { nullptr };
+
+const D3DXVECTOR3 UPWARD { 0.0f, 1.0f, 0.0f };
+D3DXVECTOR3 m_eyePos { 0.0f, 3.0f, -2.0f };
+D3DXVECTOR3 m_lookAtPos { 0.0f, 0.0f, 0.0f };
+float m_viewAngle { D3DX_PI / 4 };
+float m_radian { D3DX_PI*3 / 4 };
+
+D3DXMATRIX GetViewMatrix()
+{
+    D3DXMATRIX viewMatrix { };
+    D3DXMatrixLookAtLH(&viewMatrix,
+        &m_eyePos,
+        &m_lookAtPos,
+        &UPWARD);
+    return viewMatrix;
+}
+
+D3DXMATRIX GetProjMatrix()
+{
+    D3DXMATRIX projection_matrix { };
+    D3DXMatrixPerspectiveFovLH(
+        &projection_matrix,
+        m_viewAngle,
+        static_cast<float>(1920) / 1080, /* TODO */
+        0.1f,
+        500.0f);
+    return projection_matrix;
+}
+
+void Update()
+{
+    m_radian += 1/100.f;
+    m_eyePos.x = m_lookAtPos.x + std::sin(m_radian)*10;
+    m_eyePos.z = m_lookAtPos.z + std::cos(m_radian)*10;
+}
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT mes, WPARAM wParam, LPARAM lParam)
 {
@@ -121,13 +154,13 @@ int MainLoop()
             DispatchMessage(&m_msg);
         }
 
-        Camera::Update();
+        Update();
 
         D3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(40, 40, 80), 1.0f, 0);
         D3DDevice->BeginScene();
 
-        m_Mesh1->Render();
-        m_AnimMesh2->Render();
+        m_Mesh1->Render(GetViewMatrix(), GetProjMatrix());
+        m_AnimMesh2->Render(GetViewMatrix(), GetProjMatrix());
 
         D3DDevice->EndScene();
         D3DDevice->Present(NULL, NULL, NULL, NULL);

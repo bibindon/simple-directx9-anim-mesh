@@ -19,7 +19,7 @@ public:
         const float&);
     ~AnimMesh();
 
-    void Render();
+    void Render(const D3DXMATRIX& view, const D3DXMATRIX& proj);
     void SetPos(const D3DXVECTOR3& pos);
     void SetRotate(const D3DXVECTOR3& rotate);
 private:

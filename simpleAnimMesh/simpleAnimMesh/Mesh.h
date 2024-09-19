@@ -16,7 +16,7 @@ public:
         const float&);
     ~Mesh();
 
-    void Render();
+    void Render(const D3DXMATRIX& view, const D3DXMATRIX& proj);
 
 private:
     const std::string SHADER_FILENAME { "mesh_shader.fx" };

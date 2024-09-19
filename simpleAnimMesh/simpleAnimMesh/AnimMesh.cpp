@@ -1,10 +1,8 @@
 #include "AnimMesh.h"
 
 #include "AnimMeshAlloc.h"
-#include "MainWindow.h"
 #include "Common.h"
 #include "AnimationStrategy.h"
-#include "Camera.h"
 
 using std::vector;
 using std::string;
@@ -84,10 +82,10 @@ AnimMesh::~AnimMesh()
 {
 }
 
-void AnimMesh::Render()
+void AnimMesh::Render(const D3DXMATRIX& view, const D3DXMATRIX& proj)
 {
-    m_viewMatrix = Camera::GetViewMatrix();
-    m_projMatrix = Camera::GetProjMatrix();
+    m_viewMatrix = view;
+    m_projMatrix = proj;
 
     m_animController->Update();
 
