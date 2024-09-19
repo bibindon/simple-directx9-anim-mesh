@@ -27,7 +27,7 @@ public:
 private:
     bool m_isPlaying { false };
     std::vector<LPD3DXANIMATIONSET> m_animSets;
-    LPD3DXANIMATIONCONTROLLER m_animController { nullptr };
+    LPD3DXANIMATIONCONTROLLER m_D3DAnimController { nullptr };
     std::string m_defaultAnim;
     float m_animTime;
     std::string m_currentAnim;
@@ -58,17 +58,14 @@ public:
 
 private:
 
-    struct frame_root_deleter_object
-    {
-        std::shared_ptr<AnimMeshAllocator> allocator_;
-
-        void operator()(const LPD3DXFRAME);
-        void release_mesh_allocator(const LPD3DXFRAME);
-    };
+    void UpdateFrameMatrix(const LPD3DXFRAME, const LPD3DXMATRIX);
+    void RenderFrame(const LPD3DXFRAME);
+    void RenderMeshContainer(const LPD3DXMESHCONTAINER, const LPD3DXFRAME);
+    void ReleaseMeshAllocator(const LPD3DXFRAME);
 
     const std::string SHADER_FILENAME { "animation_mesh_shader.fx" };
-    std::shared_ptr<AnimMeshAllocator> m_allocator;
-    std::unique_ptr<D3DXFRAME, frame_root_deleter_object> m_frameRoot;
+    AnimMeshAllocator* m_allocator;
+    D3DXFRAME* m_frameRoot;
     D3DXMATRIX m_viewMatrix;
     D3DXMATRIX m_projMatrix;
 
@@ -76,15 +73,11 @@ private:
 
     LPD3DXEFFECT m_D3DEffect { nullptr };
 
-    void UpdateFrameMatrix(const LPD3DXFRAME, const LPD3DXMATRIX);
-    void RenderFrame(const LPD3DXFRAME);
-    void RenderMeshContainer(const LPD3DXMESHCONTAINER, const LPD3DXFRAME);
-
     D3DXVECTOR3 m_position;
     D3DXVECTOR3 m_rotation;
     float m_scale { 1.0f };
     std::string m_meshName;
 
-    std::unique_ptr<AnimController> m_animController;
+    AnimController* m_animController;
 };
 

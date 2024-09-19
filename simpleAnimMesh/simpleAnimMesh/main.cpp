@@ -1,5 +1,4 @@
-
-// TODO Ç‹ÇæçÌÇÍÇÈÇÕÇ∏
+// 
 #pragma comment(lib, "d3d9.lib")
 #ifdef _DEBUG
 #pragma comment(lib, "d3dx9d.lib")
@@ -22,7 +21,7 @@ Mesh* m_Mesh1 { nullptr };
 AnimMesh* m_AnimMesh2 = { nullptr };
 
 const D3DXVECTOR3 UPWARD { 0.0f, 1.0f, 0.0f };
-D3DXVECTOR3 g_eyePos { 0.0f, 3.0f, -1.0f };
+D3DXVECTOR3 g_eyePos { 0.0f, 3.0f, 0.0f };
 D3DXVECTOR3 g_lookAtPos { 0.0f, 1.0f, 0.0f };
 float g_viewAngle { D3DX_PI / 4 };
 float g_radian { D3DX_PI * 3 / 4 };

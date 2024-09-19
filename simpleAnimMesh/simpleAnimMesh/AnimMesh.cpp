@@ -11,9 +11,9 @@ using std::string;
         m_animTime { },
         m_currentAnim { "" }
 {
-    SAFE_RELEASE(m_animController);
-    m_animController = controller;
-    DWORD animation_count { m_animController->GetNumAnimationSets() };
+    SAFE_RELEASE(m_D3DAnimController);
+    m_D3DAnimController = controller;
+    DWORD animation_count { m_D3DAnimController->GetNumAnimationSets() };
 
     std::vector<LPD3DXANIMATIONSET> animation_sets(animation_count);
 
@@ -22,7 +22,7 @@ using std::string;
     for (DWORD i { 0 }; i < animation_count; ++i)
     {
         LPD3DXANIMATIONSET temp_animation_set { nullptr };
-        m_animController->GetAnimationSet(i, &temp_animation_set);
+        m_D3DAnimController->GetAnimationSet(i, &temp_animation_set);
         SAFE_RELEASE(m_animSets.at(i));
         m_animSets.at(i) = temp_animation_set;
     }
@@ -45,8 +45,8 @@ void AnimController::SetAnim(const std::string& animation_set)
     //    THROW_WITH_TRACE("An illegal animation set was sent.: " + animation_set);
     }
 
-    m_animController->SetTrackAnimationSet(0, *kit);
-    m_animController->SetTrackPosition(0, -1.001f / 60);
+    m_D3DAnimController->SetTrackAnimationSet(0, *kit);
+    m_D3DAnimController->SetTrackPosition(0, -1.001f / 60);
     m_animTime = 0.f;
 
     if (m_animConfigMap.find(animation_set) == m_animConfigMap.end())
@@ -64,8 +64,8 @@ void AnimController::SetAnim(const std::string& animation_set)
 void AnimController::Update()
 {
     m_animTime += 1.f/60;
-    m_animController->SetTrackPosition(0, 0.f);
-    m_animController->AdvanceTime(m_animTime, nullptr);
+    m_D3DAnimController->SetTrackPosition(0, 0.f);
+    m_D3DAnimController->AdvanceTime(m_animTime, nullptr);
     if (m_isPlaying)
     {
         float duration { m_animConfigMap.at(m_currentAnim).duration };
@@ -95,26 +95,21 @@ bool AnimController::is_playing()
     return m_isPlaying;
 }
 
-void AnimMesh::frame_root_deleter_object::operator()(const LPD3DXFRAME frameRoot)
-{
-    release_mesh_allocator(frameRoot);
-}
-
-void AnimMesh::frame_root_deleter_object::release_mesh_allocator(const LPD3DXFRAME frame)
+void AnimMesh::ReleaseMeshAllocator(const LPD3DXFRAME frame)
 {
     if (frame->pMeshContainer != nullptr)
     {
-        allocator_->DestroyMeshContainer(frame->pMeshContainer);
+        m_allocator->DestroyMeshContainer(frame->pMeshContainer);
     }
     if (frame->pFrameSibling != nullptr)
     {
-        release_mesh_allocator(frame->pFrameSibling);
+        ReleaseMeshAllocator(frame->pFrameSibling);
     }
     if (frame->pFrameFirstChild != nullptr)
     {
-        release_mesh_allocator(frame->pFrameFirstChild);
+        ReleaseMeshAllocator(frame->pFrameFirstChild);
     }
-    allocator_->DestroyFrame(frame);
+    m_allocator->DestroyFrame(frame);
 }
 
 AnimMesh::AnimMesh(
@@ -124,7 +119,7 @@ AnimMesh::AnimMesh(
     const D3DXVECTOR3& rotation,
     const float& scale)
     : m_allocator { new AnimMeshAllocator { xFilename } }
-    , m_frameRoot { nullptr, frame_root_deleter_object { m_allocator } }
+    , m_frameRoot { nullptr }
     , m_position { position }
     , m_rotation { rotation }
     , m_centerPos { 0.0f, 0.0f, 0.0f }
@@ -151,7 +146,7 @@ AnimMesh::AnimMesh(
         xFilename.c_str(),
         D3DXMESH_MANAGED,
         D3DDevice,
-        m_allocator.get(),
+        m_allocator,
         nullptr,
         &temp_root_frame,
         &temp_animation_controller);
@@ -161,14 +156,16 @@ AnimMesh::AnimMesh(
         throw std::exception("Failed to load a x-file.");
     }
     // lazy initialization 
-    m_frameRoot.reset(temp_root_frame);
-    m_animController.reset(new AnimController { temp_animation_controller });
+    m_frameRoot = temp_root_frame;
+    m_animController = new AnimController(temp_animation_controller);
 
     m_scale = scale;
 }
 
 AnimMesh::~AnimMesh()
 {
+    ReleaseMeshAllocator(m_frameRoot);
+    delete m_allocator;
 }
 
 void AnimMesh::Render(const D3DXMATRIX& view, const D3DXMATRIX& proj)
@@ -194,8 +191,8 @@ void AnimMesh::Render(const D3DXMATRIX& view, const D3DXMATRIX& proj)
         D3DXMatrixTranslation(&mat, m_position.x, m_position.y, m_position.z);
         worldMatrix *= mat;
     }
-    UpdateFrameMatrix(m_frameRoot.get(), &worldMatrix);
-    RenderFrame(m_frameRoot.get());
+    UpdateFrameMatrix(m_frameRoot, &worldMatrix);
+    RenderFrame(m_frameRoot);
 }
 
 void AnimMesh::SetPos(const D3DXVECTOR3& pos)
