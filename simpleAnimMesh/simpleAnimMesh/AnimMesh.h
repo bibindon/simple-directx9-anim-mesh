@@ -15,6 +15,7 @@ class AnimController
 {
 public:
     AnimController(LPD3DXANIMATIONCONTROLLER controller);
+    ~AnimController();
     void SetAnim(const std::string& animation_set);
     void Update();
     void SetDefaultAnim(const std::string& animation_name);

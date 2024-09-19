@@ -56,8 +56,6 @@ AnimMeshContainer::AnimMeshContainer(
 
     NumMaterials = (std::max)(1UL, materialsCount);
     pMaterials = new D3DXMATERIAL[NumMaterials];
-    vector<LPDIRECT3DTEXTURE9> tempTexture(NumMaterials);
-    m_vecTexture.swap(tempTexture);
 
     DWORD adjacencyCount { d3dMesh->GetNumFaces() * 3 };
     pAdjacency = new DWORD[adjacencyCount];
@@ -96,8 +94,7 @@ AnimMeshContainer::AnimMeshContainer(
                 }
                 else
                 {
-                    SAFE_RELEASE(m_vecTexture.at(i));
-                    m_vecTexture.at(i) = tempTexture;
+                    m_vecTexture.push_back(tempTexture);
                 }
             }
         }

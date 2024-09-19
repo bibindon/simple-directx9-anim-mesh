@@ -17,8 +17,8 @@
 const std::string TITLE = "simple anim mesh";
 LPDIRECT3DDEVICE9 g_D3DDevice;
 LPDIRECT3D9 m_D3D;
-Mesh* m_Mesh1 { nullptr };
-AnimMesh* m_AnimMesh2 = { nullptr };
+Mesh* m_Mesh { nullptr };
+AnimMesh* m_AnimMesh = { nullptr };
 
 const D3DXVECTOR3 UPWARD { 0.0f, 1.0f, 0.0f };
 D3DXVECTOR3 g_eyePos { 0.0f, 3.0f, 0.0f };
@@ -129,8 +129,8 @@ void Init(const HINSTANCE& hInstance)
     }
     g_D3DDevice = D3DDevice;
 
-    m_Mesh1 = new Mesh(g_D3DDevice, "tiger.x", D3DXVECTOR3(3, 1, 0), D3DXVECTOR3(0, 0, 0), 1.0f);
-    m_AnimMesh2 = new AnimMesh(g_D3DDevice, "hoshiman.x", D3DXVECTOR3(0, 0, 0), D3DXVECTOR3(0, 0, 0), 0.5f);
+    m_Mesh = new Mesh(g_D3DDevice, "tiger.x", D3DXVECTOR3(3, 1, 0), D3DXVECTOR3(0, 0, 0), 1.0f);
+    m_AnimMesh = new AnimMesh(g_D3DDevice, "hoshiman.x", D3DXVECTOR3(0, 0, 0), D3DXVECTOR3(0, 0, 0), 0.5f);
 
     ShowWindow(m_hWnd, SW_SHOW);
 }
@@ -139,6 +139,8 @@ void Finalize()
 {
     SAFE_RELEASE(g_D3DDevice);
     SAFE_RELEASE(m_D3D);
+    delete m_Mesh;
+    delete m_AnimMesh;
 }
 
 int MainLoop()
@@ -158,8 +160,8 @@ int MainLoop()
         g_D3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(40, 40, 80), 1.0f, 0);
         g_D3DDevice->BeginScene();
 
-        m_Mesh1->Render(GetViewMatrix(), GetProjMatrix());
-        m_AnimMesh2->Render(GetViewMatrix(), GetProjMatrix());
+        m_Mesh->Render(GetViewMatrix(), GetProjMatrix());
+        m_AnimMesh->Render(GetViewMatrix(), GetProjMatrix());
 
         g_D3DDevice->EndScene();
         g_D3DDevice->Present(NULL, NULL, NULL, NULL);

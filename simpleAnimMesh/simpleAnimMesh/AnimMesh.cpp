@@ -11,21 +11,26 @@ using std::string;
         m_animTime { },
         m_currentAnim { "" }
 {
-    SAFE_RELEASE(m_D3DAnimController);
     m_D3DAnimController = controller;
     DWORD animation_count { m_D3DAnimController->GetNumAnimationSets() };
 
-    std::vector<LPD3DXANIMATIONSET> animation_sets(animation_count);
-
-    m_animSets.swap(animation_sets);
+    std::vector<LPD3DXANIMATIONSET> animation_sets;
 
     for (DWORD i { 0 }; i < animation_count; ++i)
     {
         LPD3DXANIMATIONSET temp_animation_set { nullptr };
         m_D3DAnimController->GetAnimationSet(i, &temp_animation_set);
-        SAFE_RELEASE(m_animSets.at(i));
-        m_animSets.at(i) = temp_animation_set;
+        m_animSets.push_back(temp_animation_set);
     }
+}
+
+AnimController::~AnimController()
+{
+    for (int i = 0; i < m_animSets.size(); ++i)
+    {
+        m_animSets.at(i)->Release();
+    }
+    SAFE_RELEASE(m_D3DAnimController);
 }
 
 void AnimController::SetAnim(const std::string& animation_set)
@@ -166,6 +171,8 @@ AnimMesh::~AnimMesh()
 {
     ReleaseMeshAllocator(m_frameRoot);
     delete m_allocator;
+    delete m_animController;
+    m_D3DEffect->Release();
 }
 
 void AnimMesh::Render(const D3DXMATRIX& view, const D3DXMATRIX& proj)
