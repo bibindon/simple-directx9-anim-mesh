@@ -5,6 +5,7 @@ using std::string;
 using std::vector;
 
 Mesh::Mesh(
+    const LPDIRECT3DDEVICE9 D3DDevice,
     const string& xFilename,
     const D3DXVECTOR3& position,
     const D3DXVECTOR3& rotation,
@@ -17,7 +18,7 @@ Mesh::Mesh(
 
     HRESULT result { 0 };
     D3DXCreateEffectFromFile(
-        Common::GetD3DDevice(),
+        D3DDevice,
         SHADER_FILENAME.c_str(),
         nullptr,
         nullptr,
@@ -36,7 +37,7 @@ Mesh::Mesh(
     result = D3DXLoadMeshFromX(
         xFilename.c_str(),
         D3DXMESH_SYSTEMMEM,
-        Common::GetD3DDevice(),
+        D3DDevice,
         &adjacencyBuffer,
         &materialBuffer,
         nullptr,
@@ -76,7 +77,7 @@ Mesh::Mesh(
     };
 
     LPD3DXMESH tempMesh { nullptr };
-    result = m_D3DMesh->CloneMesh(D3DXMESH_MANAGED, decl, Common::GetD3DDevice(), &tempMesh);
+    result = m_D3DMesh->CloneMesh(D3DXMESH_MANAGED, decl, D3DDevice, &tempMesh);
 
     if (FAILED(result))
     {
@@ -126,7 +127,7 @@ Mesh::Mesh(
             texPath += materials[i].pTextureFilename;
             LPDIRECT3DTEXTURE9 tempTexture { nullptr };
             if (FAILED(D3DXCreateTextureFromFile(
-                Common::GetD3DDevice(),
+                D3DDevice,
                 texPath.c_str(),
                 &tempTexture)))
             {

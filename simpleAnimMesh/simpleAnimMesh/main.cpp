@@ -7,6 +7,7 @@
 #pragma comment(lib, "d3dx9.lib")
 #endif
 
+#include "Common.h"
 #include "Mesh.h"
 #include "AnimMesh.h"
 
@@ -15,23 +16,23 @@
 #include <d3dx9.h>
 
 const std::string TITLE = "simple anim mesh";
-HWND m_hWnd;
+LPDIRECT3DDEVICE9 g_D3DDevice;
 LPDIRECT3D9 m_D3D;
 Mesh* m_Mesh1 { nullptr };
 AnimMesh* m_AnimMesh2 = { nullptr };
 
 const D3DXVECTOR3 UPWARD { 0.0f, 1.0f, 0.0f };
-D3DXVECTOR3 m_eyePos { 0.0f, 3.0f, -2.0f };
-D3DXVECTOR3 m_lookAtPos { 0.0f, 0.0f, 0.0f };
-float m_viewAngle { D3DX_PI / 4 };
-float m_radian { D3DX_PI*3 / 4 };
+D3DXVECTOR3 g_eyePos { 0.0f, 3.0f, -2.0f };
+D3DXVECTOR3 g_lookAtPos { 0.0f, 0.0f, 0.0f };
+float g_viewAngle { D3DX_PI / 4 };
+float g_radian { D3DX_PI*3 / 4 };
 
 D3DXMATRIX GetViewMatrix()
 {
     D3DXMATRIX viewMatrix { };
     D3DXMatrixLookAtLH(&viewMatrix,
-        &m_eyePos,
-        &m_lookAtPos,
+        &g_eyePos,
+        &g_lookAtPos,
         &UPWARD);
     return viewMatrix;
 }
@@ -41,7 +42,7 @@ D3DXMATRIX GetProjMatrix()
     D3DXMATRIX projection_matrix { };
     D3DXMatrixPerspectiveFovLH(
         &projection_matrix,
-        m_viewAngle,
+        g_viewAngle,
         static_cast<float>(1920) / 1080, /* TODO */
         0.1f,
         500.0f);
@@ -50,9 +51,9 @@ D3DXMATRIX GetProjMatrix()
 
 void Update()
 {
-    m_radian += 1/100.f;
-    m_eyePos.x = m_lookAtPos.x + std::sin(m_radian)*10;
-    m_eyePos.z = m_lookAtPos.z + std::cos(m_radian)*10;
+    g_radian += 1/100.f;
+    g_eyePos.x = g_lookAtPos.x + std::sin(g_radian)*10;
+    g_eyePos.z = g_lookAtPos.z + std::cos(g_radian)*10;
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT mes, WPARAM wParam, LPARAM lParam)
@@ -87,6 +88,7 @@ void Init(const HINSTANCE& hInstance)
         throw std::exception("");
     }
 
+    HWND m_hWnd;
     if (!(m_hWnd = CreateWindow(TITLE.c_str(), TITLE.c_str(), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, 0,
         CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL)))
     {
@@ -126,24 +128,22 @@ void Init(const HINSTANCE& hInstance)
             throw std::exception("");
         }
     }
+    g_D3DDevice = D3DDevice;
 
-    Common::SetD3DDevice(D3DDevice);
-
-    m_Mesh1 = new Mesh("tiger.x", D3DXVECTOR3(3, 1, 0), D3DXVECTOR3(0, 0, 0), 1.0f);
-    m_AnimMesh2 = new AnimMesh("hoshiman.x", D3DXVECTOR3(0, 0, 0), D3DXVECTOR3(0, 0, 0), 0.5f);
+    m_Mesh1 = new Mesh(g_D3DDevice, "tiger.x", D3DXVECTOR3(3, 1, 0), D3DXVECTOR3(0, 0, 0), 1.0f);
+    m_AnimMesh2 = new AnimMesh(g_D3DDevice, "hoshiman.x", D3DXVECTOR3(0, 0, 0), D3DXVECTOR3(0, 0, 0), 0.5f);
 
     ShowWindow(m_hWnd, SW_SHOW);
 }
 
 void Finalize()
 {
-    Common::Finalize();
-    m_D3D->Release();
+    SAFE_RELEASE(g_D3DDevice);
+    SAFE_RELEASE(m_D3D);
 }
 
 int MainLoop()
 {
-    LPDIRECT3DDEVICE9 D3DDevice = Common::GetD3DDevice();
     MSG m_msg;
 
     do
@@ -156,14 +156,14 @@ int MainLoop()
 
         Update();
 
-        D3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(40, 40, 80), 1.0f, 0);
-        D3DDevice->BeginScene();
+        g_D3DDevice->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, D3DCOLOR_XRGB(40, 40, 80), 1.0f, 0);
+        g_D3DDevice->BeginScene();
 
         m_Mesh1->Render(GetViewMatrix(), GetProjMatrix());
         m_AnimMesh2->Render(GetViewMatrix(), GetProjMatrix());
 
-        D3DDevice->EndScene();
-        D3DDevice->Present(NULL, NULL, NULL, NULL);
+        g_D3DDevice->EndScene();
+        g_D3DDevice->Present(NULL, NULL, NULL, NULL);
 
     } while (m_msg.message != WM_QUIT);
 

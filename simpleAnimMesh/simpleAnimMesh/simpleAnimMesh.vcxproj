@@ -152,15 +152,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AnimationStrategy.cpp" />
     <ClCompile Include="AnimMesh.cpp" />
     <ClCompile Include="AnimMeshAlloc.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Common.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AnimationStrategy.h" />
     <ClInclude Include="AnimMesh.h" />
     <ClInclude Include="AnimMeshAlloc.h" />
     <ClInclude Include="Common.h" />
