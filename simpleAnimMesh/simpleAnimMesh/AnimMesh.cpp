@@ -75,7 +75,7 @@ AnimMesh::AnimMesh(
     }
     // lazy initialization 
     m_frameRoot.reset(temp_root_frame);
-    m_animationStrategy.reset(new normal_animation { temp_animation_controller });
+    m_animationStrategy.reset(new animation_strategy { temp_animation_controller });
 
     m_scale = scale;
 }

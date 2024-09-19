@@ -1,11 +1,6 @@
 #include "AnimationStrategy.h"
 
-void no_animation::update()
-{
-    // do nothing
-};
-
- normal_animation::normal_animation(LPD3DXANIMATIONCONTROLLER controller)
+ animation_strategy::animation_strategy(LPD3DXANIMATIONCONTROLLER controller)
         : default_animation_ { "" },
         animation_time_ { },
         playing_animation_ { "" }
@@ -27,7 +22,7 @@ void no_animation::update()
     }
 }
 
-void normal_animation::set_animation(const std::string& animation_set)
+void animation_strategy::set_animation(const std::string& animation_set)
 {
     std::vector<LPD3DXANIMATIONSET>::const_iterator kit;
 
@@ -59,7 +54,8 @@ void normal_animation::set_animation(const std::string& animation_set)
         playing_animation_ = animation_set;
     }
 };
-void normal_animation::update()
+
+void animation_strategy::update()
 {
     animation_time_ += 1.f/60;
     animation_controller_->SetTrackPosition(0, 0.f);
@@ -75,17 +71,20 @@ void normal_animation::update()
         }
     }
 };
-void normal_animation::set_default_animation(const std::string& animation_name)
+
+void animation_strategy::set_default_animation(const std::string& animation_name)
 {
     default_animation_ = animation_name;
     set_animation(default_animation_);
 }
-void normal_animation::set_animation_config(
+
+void animation_strategy::set_animation_config(
     const std::string& animation_name, const bool& loop, const float& duration)
 {
     animation_configs_.emplace(animation_name, animation_config { loop, duration });
 }
-bool normal_animation::is_playing()
+
+bool animation_strategy::is_playing()
 {
     return is_playing_;
 }

@@ -8,43 +8,23 @@
 #include <unordered_map>
 #include "Common.h"
 
-// TODO åpè≥ñ≥Ç≠Ç∑
 class animation_strategy
 {
 public:
-    virtual void update() = 0;
-    virtual void set_animation(const std::string&) { }
-    virtual void set_default_animation(const std::string&) { }
-    virtual void set_animation_config(const std::string&, const bool&, const float&) { }
-    virtual ~animation_strategy() { }
-    virtual bool is_playing() { return false; }
-protected:
-    bool is_playing_ { false };
-    std::vector<LPD3DXANIMATIONSET> animation_sets_;
-    LPD3DXANIMATIONCONTROLLER animation_controller_ { nullptr };
-};
-
-class no_animation : public animation_strategy
-{
-public:
-    void update() override;
-};
-
-class normal_animation : public animation_strategy
-{
-public:
-    normal_animation(LPD3DXANIMATIONCONTROLLER controller);
-
-    void set_animation(const std::string& animation_set) override;
-    void update() override;
-    void set_default_animation(const std::string& animation_name) override;
+    animation_strategy(LPD3DXANIMATIONCONTROLLER controller);
+    void set_animation(const std::string& animation_set);
+    void update();
+    void set_default_animation(const std::string& animation_name);
     void set_animation_config(
         const std::string& animation_name,
         const bool& loop,
-        const float& duration) override;
-    virtual bool is_playing() override;
+        const float& duration);
+    bool is_playing();
 
 private:
+    bool is_playing_ { false };
+    std::vector<LPD3DXANIMATIONSET> animation_sets_;
+    LPD3DXANIMATIONCONTROLLER animation_controller_ { nullptr };
     std::string default_animation_;
     float animation_time_;
     std::string playing_animation_;
@@ -56,4 +36,5 @@ private:
     };
     std::unordered_map<std::string, animation_config> animation_configs_;
 };
+
 
