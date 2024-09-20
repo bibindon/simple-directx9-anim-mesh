@@ -29,8 +29,8 @@ public:
     void SetAnim(const std::string& animationSet);
     void SetDefaultAnim(const std::string& animationName);
     void SetAnimConfig(const std::string& animationName,
-                       const bool& loop,
-                       const float& duration);
+                       const bool loop,
+                       const float duration);
     bool isPlaying();
 private:
 

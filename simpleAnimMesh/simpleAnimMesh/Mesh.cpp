@@ -6,13 +6,12 @@ Mesh::Mesh(const LPDIRECT3DDEVICE9 D3DDevice,
            const D3DXVECTOR3& position,
            const D3DXVECTOR3& rotation,
            const float& scale)
-    : m_meshName { xFilename }
-    , m_pos { position }
-    , m_rotate { rotation }
-    , m_scale { scale }
+    : m_meshName(xFilename)
+    , m_pos(position)
+    , m_rotate(rotation)
+    , m_scale(scale)
 {
-
-    HRESULT result { 0 };
+    HRESULT result = 0;
     D3DXCreateEffectFromFile(D3DDevice,
                              SHADER_FILENAME.c_str(),
                              nullptr,
@@ -70,7 +69,7 @@ Mesh::Mesh(const LPDIRECT3DDEVICE9 D3DDevice,
         D3DDECL_END(),
     };
 
-    LPD3DXMESH tempMesh { nullptr };
+    LPD3DXMESH tempMesh = nullptr;
     result = m_D3DMesh->CloneMesh(D3DXMESH_MANAGED, decl, D3DDevice, &tempMesh);
 
     if (FAILED(result))
@@ -79,7 +78,7 @@ Mesh::Mesh(const LPDIRECT3DDEVICE9 D3DDevice,
     }
     SAFE_RELEASE(m_D3DMesh);
     m_D3DMesh = tempMesh;
-    DWORD* wordBuffer { static_cast<DWORD*>(adjacencyBuffer->GetBufferPointer()) };
+    DWORD* wordBuffer = static_cast<DWORD*>(adjacencyBuffer->GetBufferPointer());
 
     result = D3DXComputeNormals(m_D3DMesh, wordBuffer);
 
@@ -152,21 +151,21 @@ void Mesh::Render(const D3DXMATRIX& view, const D3DXMATRIX& proj)
 {
     D3DXMATRIX matWorldViewProj { };
     D3DXMatrixIdentity(&matWorldViewProj);
-    {
-        D3DXMATRIX mat { };
 
-        D3DXMatrixTranslation(&mat, -m_centerPos.x, -m_centerPos.y, -m_centerPos.z);
-        matWorldViewProj *= mat;
+    D3DXMATRIX mat { };
 
-        D3DXMatrixScaling(&mat, m_scale, m_scale, m_scale);
-        matWorldViewProj *= mat;
+    D3DXMatrixTranslation(&mat, -m_centerPos.x, -m_centerPos.y, -m_centerPos.z);
+    matWorldViewProj *= mat;
 
-        D3DXMatrixRotationYawPitchRoll(&mat, m_rotate.x, m_rotate.y, m_rotate.z);
-        matWorldViewProj *= mat;
+    D3DXMatrixScaling(&mat, m_scale, m_scale, m_scale);
+    matWorldViewProj *= mat;
 
-        D3DXMatrixTranslation(&mat, m_pos.x, m_pos.y, m_pos.z);
-        matWorldViewProj *= mat;
-    }
+    D3DXMatrixRotationYawPitchRoll(&mat, m_rotate.x, m_rotate.y, m_rotate.z);
+    matWorldViewProj *= mat;
+
+    D3DXMatrixTranslation(&mat, m_pos.x, m_pos.y, m_pos.z);
+    matWorldViewProj *= mat;
+
     matWorldViewProj *= view;
     matWorldViewProj *= proj;
 

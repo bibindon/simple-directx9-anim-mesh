@@ -3,23 +3,6 @@
 #include "AnimMeshAlloc.h"
 #include "Common.h"
 
-void AnimMesh::ReleaseMeshAllocator(const LPD3DXFRAME frame)
-{
-    if (frame->pMeshContainer != nullptr)
-    {
-        m_allocator->DestroyMeshContainer(frame->pMeshContainer);
-    }
-    if (frame->pFrameSibling != nullptr)
-    {
-        ReleaseMeshAllocator(frame->pFrameSibling);
-    }
-    if (frame->pFrameFirstChild != nullptr)
-    {
-        ReleaseMeshAllocator(frame->pFrameFirstChild);
-    }
-    m_allocator->DestroyFrame(frame);
-}
-
 AnimMesh::AnimMesh(const LPDIRECT3DDEVICE9 D3DDevice,
                    const std::string& xFilename,
                    const D3DXVECTOR3& position,
@@ -28,6 +11,7 @@ AnimMesh::AnimMesh(const LPDIRECT3DDEVICE9 D3DDevice,
     : m_allocator(new AnimMeshAllocator(xFilename))
     , m_position(position)
     , m_rotation(rotation)
+    , m_scale(scale)
 {
     HRESULT result = D3DXCreateEffectFromFile(D3DDevice,
                                               SHADER_FILENAME.c_str(),
@@ -42,26 +26,19 @@ AnimMesh::AnimMesh(const LPDIRECT3DDEVICE9 D3DDevice,
         throw std::exception("Failed to create an effect file.");
     }
 
-    LPD3DXFRAME tempRootFrame = nullptr;
-    LPD3DXANIMATIONCONTROLLER tempAnimController = nullptr;
-
     result = D3DXLoadMeshHierarchyFromX(xFilename.c_str(),
                                         D3DXMESH_MANAGED,
                                         D3DDevice,
                                         m_allocator,
                                         nullptr,
-                                        &tempRootFrame,
-                                        &tempAnimController);
+                                        &m_frameRoot,
+                                        &m_D3DAnimController);
 
     if (FAILED(result))
     {
         throw std::exception("Failed to load a x-file.");
     }
-    m_frameRoot = tempRootFrame;
-
-    m_D3DAnimController = tempAnimController;
     DWORD animationCount = m_D3DAnimController->GetNumAnimationSets();
-
     std::vector<LPD3DXANIMATIONSET> animationSets;
 
     for (DWORD i = 0; i < animationCount; ++i)
@@ -70,8 +47,6 @@ AnimMesh::AnimMesh(const LPDIRECT3DDEVICE9 D3DDevice,
         m_D3DAnimController->GetAnimationSet(i, &tempAnimationSet);
         m_animSets.push_back(tempAnimationSet);
     }
-
-    m_scale = scale;
 }
 
 AnimMesh::~AnimMesh()
@@ -83,8 +58,8 @@ AnimMesh::~AnimMesh()
     SAFE_RELEASE(m_D3DAnimController);
 
     ReleaseMeshAllocator(m_frameRoot);
-    delete m_allocator;
-    m_D3DEffect->Release();
+    SAFE_DELETE(m_allocator);
+    SAFE_RELEASE(m_D3DEffect);
 }
 
 void AnimMesh::Render(const D3DXMATRIX& view, const D3DXMATRIX& proj)
@@ -92,23 +67,24 @@ void AnimMesh::Render(const D3DXMATRIX& view, const D3DXMATRIX& proj)
     m_viewMatrix = view;
     m_projMatrix = proj;
 
-    D3DXMATRIX worldMatrix { };
-    D3DXMatrixIdentity(&worldMatrix);
-    {
-        D3DXMATRIX mat { };
-        D3DXMatrixTranslation(&mat, -m_centerPos.x, -m_centerPos.y, -m_centerPos.z);
-        worldMatrix *= mat;
+    D3DXMATRIX matWorld { };
+    D3DXMatrixIdentity(&matWorld);
 
-        D3DXMatrixScaling(&mat, m_scale, m_scale, m_scale);
-        worldMatrix *= mat;
+    D3DXMATRIX mat { };
 
-        D3DXMatrixRotationYawPitchRoll(&mat, m_rotation.x, m_rotation.y, m_rotation.z);
-        worldMatrix *= mat;
+    D3DXMatrixTranslation(&mat, -m_centerPos.x, -m_centerPos.y, -m_centerPos.z);
+    matWorld *= mat;
 
-        D3DXMatrixTranslation(&mat, m_position.x, m_position.y, m_position.z);
-        worldMatrix *= mat;
-    }
-    UpdateFrameMatrix(m_frameRoot, &worldMatrix);
+    D3DXMatrixScaling(&mat, m_scale, m_scale, m_scale);
+    matWorld *= mat;
+
+    D3DXMatrixRotationYawPitchRoll(&mat, m_rotation.x, m_rotation.y, m_rotation.z);
+    matWorld *= mat;
+
+    D3DXMatrixTranslation(&mat, m_position.x, m_position.y, m_position.z);
+    matWorld *= mat;
+
+    UpdateFrameMatrix(m_frameRoot, &matWorld);
     RenderFrame(m_frameRoot);
 }
 
@@ -138,6 +114,7 @@ void AnimMesh::UpdateFrameMatrix(const LPD3DXFRAME frameBase, const LPD3DXMATRIX
     {
         UpdateFrameMatrix(frame->pFrameSibling, parentMatrix);
     }
+
     if (frame->pFrameFirstChild != nullptr)
     {
         UpdateFrameMatrix(frame->pFrameFirstChild, &frame->m_combinedMatrix);
@@ -146,19 +123,18 @@ void AnimMesh::UpdateFrameMatrix(const LPD3DXFRAME frameBase, const LPD3DXMATRIX
 
 void AnimMesh::RenderFrame(const LPD3DXFRAME frame)
 {
+    LPD3DXMESHCONTAINER meshContainer = frame->pMeshContainer;
+    while (meshContainer != nullptr)
     {
-        LPD3DXMESHCONTAINER meshContainer { frame->pMeshContainer };
-        while (meshContainer != nullptr)
-        {
-            RenderMeshContainer(meshContainer, frame);
-            meshContainer = meshContainer->pNextMeshContainer;
-        }
+        RenderMeshContainer(meshContainer, frame);
+        meshContainer = meshContainer->pNextMeshContainer;
     }
 
     if (frame->pFrameSibling != nullptr)
     {
         RenderFrame(frame->pFrameSibling);
     }
+
     if (frame->pFrameFirstChild != nullptr)
     {
         RenderFrame(frame->pFrameFirstChild);
@@ -185,19 +161,39 @@ void AnimMesh::RenderMeshContainer(const LPD3DXMESHCONTAINER meshContainerBase,
 
         for (DWORD i = 0; i < meshContainer->NumMaterials; ++i)
         {
-            D3DXVECTOR4 color {meshContainer->pMaterials[i].MatD3D.Diffuse.r,
-                               meshContainer->pMaterials[i].MatD3D.Diffuse.g,
-                               meshContainer->pMaterials[i].MatD3D.Diffuse.b,
-                               meshContainer->pMaterials[i].MatD3D.Diffuse.a };
+            D3DXVECTOR4 color { meshContainer->pMaterials[i].MatD3D.Diffuse.r,
+                                meshContainer->pMaterials[i].MatD3D.Diffuse.g,
+                                meshContainer->pMaterials[i].MatD3D.Diffuse.b,
+                                meshContainer->pMaterials[i].MatD3D.Diffuse.a };
             m_D3DEffect->SetVector("g_diffuse", &color);
             m_D3DEffect->SetTexture("g_tex", meshContainer->m_vecTexture.at(i));
-
             m_D3DEffect->CommitChanges();
+
             meshContainer->MeshData.pMesh->DrawSubset(i);
         }
+        m_D3DEffect->EndPass();
     }
-    m_D3DEffect->EndPass();
     m_D3DEffect->End();
+}
+
+void AnimMesh::ReleaseMeshAllocator(const LPD3DXFRAME frame)
+{
+    if (frame->pMeshContainer != nullptr)
+    {
+        m_allocator->DestroyMeshContainer(frame->pMeshContainer);
+    }
+
+    if (frame->pFrameSibling != nullptr)
+    {
+        ReleaseMeshAllocator(frame->pFrameSibling);
+    }
+
+    if (frame->pFrameFirstChild != nullptr)
+    {
+        ReleaseMeshAllocator(frame->pFrameFirstChild);
+    }
+
+    m_allocator->DestroyFrame(frame);
 }
 
 void AnimMesh::SetAnim(const std::string& animSet)
@@ -211,6 +207,7 @@ void AnimMesh::SetAnim(const std::string& animSet)
             break;
         }
     }
+
     if (_index == -1)
     {
         return;
@@ -224,6 +221,7 @@ void AnimMesh::SetAnim(const std::string& animSet)
     {
         return;
     }
+
     if (animSet != m_defaultAnim && !m_animConfigMap.at(animSet).loop)
     {
         m_isPlaying = true;
@@ -238,7 +236,7 @@ void AnimMesh::Update()
     m_D3DAnimController->AdvanceTime(m_animTime, nullptr);
     if (m_isPlaying)
     {
-        float duration { m_animConfigMap.at(m_currentAnim).duration };
+        float duration = m_animConfigMap.at(m_currentAnim).duration;
         if (m_animTime + 0.001f >= duration)
         {
             SetAnim(m_defaultAnim);
@@ -255,10 +253,10 @@ void AnimMesh::SetDefaultAnim(const std::string& animation_name)
 }
 
 void AnimMesh::SetAnimConfig(const std::string& animName,
-                                   const bool& loop,
-                                   const float& duration)
+                             const bool loop,
+                             const float duration)
 {
-    m_animConfigMap.emplace(animName, AnimConfig { loop, duration });
+    m_animConfigMap[animName] = AnimConfig { loop, duration };
 }
 
 bool AnimMesh::isPlaying()

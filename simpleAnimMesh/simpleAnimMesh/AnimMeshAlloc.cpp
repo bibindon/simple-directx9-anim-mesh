@@ -71,8 +71,6 @@ AnimMeshContainer::AnimMeshContainer(const std::string& xFilename,
 
         for (DWORD i = 0; i < materialsCount; ++i)
         {
-            // TODO pMaterialsに値をセットするのは無意味な気がする。
-            pMaterials[i].MatD3D.Ambient = D3DCOLORVALUE { 0.2f, 0.2f, 0.2f, 0.2f };
             if (pMaterials[i].pTextureFilename != nullptr)
             {
                 std::string texPath = xFileDir;
