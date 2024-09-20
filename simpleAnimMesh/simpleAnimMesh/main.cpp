@@ -175,6 +175,7 @@ int MainLoop()
         }
 
         Update();
+        g_AnimMesh->Update();
 
         g_D3DDevice->Clear(0,
                            NULL,

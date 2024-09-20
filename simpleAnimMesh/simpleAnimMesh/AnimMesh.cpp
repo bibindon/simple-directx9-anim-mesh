@@ -3,99 +3,6 @@
 #include "AnimMeshAlloc.h"
 #include "Common.h"
 
-using std::vector;
-using std::string;
-
- AnimController::AnimController(LPD3DXANIMATIONCONTROLLER controller)
-{
-    m_D3DAnimController = controller;
-    DWORD animationCount = m_D3DAnimController->GetNumAnimationSets();
-
-    std::vector<LPD3DXANIMATIONSET> animationSets;
-
-    for (DWORD i = 0; i < animationCount; ++i)
-    {
-        LPD3DXANIMATIONSET tempAnimationSet = nullptr;
-        m_D3DAnimController->GetAnimationSet(i, &tempAnimationSet);
-        m_animSets.push_back(tempAnimationSet);
-    }
-}
-
-AnimController::~AnimController()
-{
-    for (std::size_t i = 0; i < m_animSets.size(); ++i)
-    {
-        SAFE_RELEASE(m_animSets.at(i));
-    }
-    SAFE_RELEASE(m_D3DAnimController);
-}
-
-void AnimController::SetAnim(const std::string& animSet)
-{
-    std::size_t _index = -1;
-    for (std::size_t i = 0; i < m_animSets.size(); ++i)
-    {
-        if (m_animSets.at(i)->GetName() == animSet)
-        {
-            _index = i;
-            break;
-        }
-    }
-    if (_index == -1)
-    {
-        return;
-    }
-
-    m_D3DAnimController->SetTrackAnimationSet(0, m_animSets.at(_index));
-    m_D3DAnimController->SetTrackPosition(0, -1.001f / 60);
-    m_animTime = 0.f;
-
-    if (m_animConfigMap.find(animSet) == m_animConfigMap.end())
-    {
-        return;
-    }
-    if (animSet != m_defaultAnim && !m_animConfigMap.at(animSet).loop)
-    {
-        m_isPlaying = true;
-        m_currentAnim = animSet;
-    }
-};
-
-void AnimController::Update()
-{
-    m_animTime += 1.f/60;
-    m_D3DAnimController->SetTrackPosition(0, 0.f);
-    m_D3DAnimController->AdvanceTime(m_animTime, nullptr);
-    if (m_isPlaying)
-    {
-        float duration { m_animConfigMap.at(m_currentAnim).duration };
-        if (m_animTime + 0.001f >= duration)
-        {
-            SetAnim(m_defaultAnim);
-            m_isPlaying = false;
-            m_animTime = 0;
-        }
-    }
-};
-
-void AnimController::SetDefaultAnim(const std::string& animation_name)
-{
-    m_defaultAnim = animation_name;
-    SetAnim(m_defaultAnim);
-}
-
-void AnimController::SetAnimConfig(const std::string& animName,
-                                   const bool& loop,
-                                   const float& duration)
-{
-    m_animConfigMap.emplace(animName, AnimConfig { loop, duration });
-}
-
-bool AnimController::isPlaying()
-{
-    return m_isPlaying;
-}
-
 void AnimMesh::ReleaseMeshAllocator(const LPD3DXFRAME frame)
 {
     if (frame->pMeshContainer != nullptr)
@@ -114,7 +21,7 @@ void AnimMesh::ReleaseMeshAllocator(const LPD3DXFRAME frame)
 }
 
 AnimMesh::AnimMesh(const LPDIRECT3DDEVICE9 D3DDevice,
-                   const string& xFilename,
+                   const std::string& xFilename,
                    const D3DXVECTOR3& position,
                    const D3DXVECTOR3& rotation,
                    const float& scale)
@@ -151,16 +58,32 @@ AnimMesh::AnimMesh(const LPDIRECT3DDEVICE9 D3DDevice,
         throw std::exception("Failed to load a x-file.");
     }
     m_frameRoot = tempRootFrame;
-    m_animController = new AnimController(tempAnimController);
+
+    m_D3DAnimController = tempAnimController;
+    DWORD animationCount = m_D3DAnimController->GetNumAnimationSets();
+
+    std::vector<LPD3DXANIMATIONSET> animationSets;
+
+    for (DWORD i = 0; i < animationCount; ++i)
+    {
+        LPD3DXANIMATIONSET tempAnimationSet = nullptr;
+        m_D3DAnimController->GetAnimationSet(i, &tempAnimationSet);
+        m_animSets.push_back(tempAnimationSet);
+    }
 
     m_scale = scale;
 }
 
 AnimMesh::~AnimMesh()
 {
+    for (std::size_t i = 0; i < m_animSets.size(); ++i)
+    {
+        SAFE_RELEASE(m_animSets.at(i));
+    }
+    SAFE_RELEASE(m_D3DAnimController);
+
     ReleaseMeshAllocator(m_frameRoot);
     delete m_allocator;
-    delete m_animController;
     m_D3DEffect->Release();
 }
 
@@ -168,8 +91,6 @@ void AnimMesh::Render(const D3DXMATRIX& view, const D3DXMATRIX& proj)
 {
     m_viewMatrix = view;
     m_projMatrix = proj;
-
-    m_animController->Update();
 
     D3DXMATRIX worldMatrix { };
     D3DXMatrixIdentity(&worldMatrix);
@@ -277,5 +198,71 @@ void AnimMesh::RenderMeshContainer(const LPD3DXMESHCONTAINER meshContainerBase,
     }
     m_D3DEffect->EndPass();
     m_D3DEffect->End();
+}
+
+void AnimMesh::SetAnim(const std::string& animSet)
+{
+    std::size_t _index = -1;
+    for (std::size_t i = 0; i < m_animSets.size(); ++i)
+    {
+        if (m_animSets.at(i)->GetName() == animSet)
+        {
+            _index = i;
+            break;
+        }
+    }
+    if (_index == -1)
+    {
+        return;
+    }
+
+    m_D3DAnimController->SetTrackAnimationSet(0, m_animSets.at(_index));
+    m_D3DAnimController->SetTrackPosition(0, -1.001f / 60);
+    m_animTime = 0.f;
+
+    if (m_animConfigMap.find(animSet) == m_animConfigMap.end())
+    {
+        return;
+    }
+    if (animSet != m_defaultAnim && !m_animConfigMap.at(animSet).loop)
+    {
+        m_isPlaying = true;
+        m_currentAnim = animSet;
+    }
+};
+
+void AnimMesh::Update()
+{
+    m_animTime += 1.f/60;
+    m_D3DAnimController->SetTrackPosition(0, 0.f);
+    m_D3DAnimController->AdvanceTime(m_animTime, nullptr);
+    if (m_isPlaying)
+    {
+        float duration { m_animConfigMap.at(m_currentAnim).duration };
+        if (m_animTime + 0.001f >= duration)
+        {
+            SetAnim(m_defaultAnim);
+            m_isPlaying = false;
+            m_animTime = 0;
+        }
+    }
+};
+
+void AnimMesh::SetDefaultAnim(const std::string& animation_name)
+{
+    m_defaultAnim = animation_name;
+    SetAnim(m_defaultAnim);
+}
+
+void AnimMesh::SetAnimConfig(const std::string& animName,
+                                   const bool& loop,
+                                   const float& duration)
+{
+    m_animConfigMap.emplace(animName, AnimConfig { loop, duration });
+}
+
+bool AnimMesh::isPlaying()
+{
+    return m_isPlaying;
 }
 
